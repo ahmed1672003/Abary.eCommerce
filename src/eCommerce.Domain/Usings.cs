@@ -4,4 +4,5 @@ global using eCommerce.Domain.Bases.Entities;
 global using eCommerce.Domain.Entities.Identity;
 global using eCommerce.Domain.Entities.Shared;
 global using Microsoft.AspNetCore.Identity;
+global using Microsoft.Extensions.DependencyInjection;
 global using Pavon.Domain.Abstractions.Common;
