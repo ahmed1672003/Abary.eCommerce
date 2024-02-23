@@ -10,4 +10,8 @@
     <ProjectReference Include="..\eCommerce.Persistence\eCommerce.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Identity\Features\User\Dto\" />
+  </ItemGroup>
+
 </Project>

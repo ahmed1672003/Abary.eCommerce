@@ -7,6 +7,8 @@ public static class Registeration
         IConfiguration configuration
     )
     {
+        services.AddScoped<IUserService, UserService>();
+
         services.AddFastEndpoints();
         services.SwaggerDocument(o =>
         {

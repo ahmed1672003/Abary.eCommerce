@@ -1,6 +1,4 @@
-﻿using eCommerce.Persistence.Middlewares.ExceptionHandling;
-
-namespace eCommerce.API;
+﻿namespace eCommerce.API;
 
 public static class HostingExtension
 {
