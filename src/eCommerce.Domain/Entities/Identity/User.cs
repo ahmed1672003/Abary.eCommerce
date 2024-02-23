@@ -33,6 +33,6 @@ public sealed class User
     public UserProfile Profile { get; set; }
     public List<UserRole> UserRoles { get; set; }
     public List<UserLogin> Logins { get; set; }
-    public UserToken Token { get; set; }
+    public List<UserToken> Tokens { get; set; }
     #endregion
 }

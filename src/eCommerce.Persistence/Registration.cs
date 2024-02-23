@@ -10,15 +10,14 @@ public static class Registration
         #region Env Configurations
         var root = Directory.GetCurrentDirectory();
         var parentRoot = Directory.GetParent(root);
-        var dotenv = Path.Combine(parentRoot.Name, ".env");
+        var dotenv = Path.Combine(parentRoot.FullName, ".env");
         Env.Load(dotenv);
         #endregion
-
+        var r = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
         #region DbContext Configurations
         services.AddDbContext<IeCommerceDbContext, eCommerceDbContext>(
             options =>
             {
-                var r = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
                 options.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING"));
                 options.AddInterceptors(new CustomSaveChangesInterceptor());
             },
