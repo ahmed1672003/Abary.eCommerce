@@ -2,7 +2,7 @@
 
 public interface ITrackableUpdate<TUpdater>
 {
-    DateTime UpdatedOn { get; set; }
+    DateTime? UpdatedOn { get; set; }
     TUpdater? UpdatedBy { get; set; }
 
     Task UpdateAsync() =>

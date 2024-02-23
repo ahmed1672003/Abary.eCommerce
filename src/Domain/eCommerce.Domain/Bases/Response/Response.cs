@@ -1,7 +1,5 @@
-﻿using System.Net;
-using System.Text.Json.Serialization;
+﻿namespace eCommerce.Domain.Bases.Response;
 
-namespace eCommerce.Domain.Bases.Response;
 public record Response
 {
     public Response() => StatusCode = (int)HttpStatusCode.OK;
