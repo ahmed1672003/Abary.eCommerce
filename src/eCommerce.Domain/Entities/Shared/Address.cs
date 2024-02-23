@@ -31,6 +31,6 @@ public sealed class Address
     #endregion
 
     #region Navigations
-    public User User { get; set; }
+    public UserProfile UserProfile { get; set; }
     #endregion
 }

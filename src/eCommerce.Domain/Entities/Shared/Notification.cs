@@ -1,6 +1,4 @@
-﻿using eCommerce.Domain.Enums;
-
-namespace eCommerce.Domain.Entities.Shared;
+﻿namespace eCommerce.Domain.Entities.Shared;
 
 public sealed class Notification
     : BaseEntity<Guid>,
@@ -14,18 +12,21 @@ public sealed class Notification
     #endregion
 
     #region Keys
+    public Guid EntityId { get; set; }
     public Guid CreatedBy { get; set; } = Guid.Empty;
     public Guid DeletedBy { get; set; } = Guid.Empty;
     public Guid UpdatedBy { get; set; } = Guid.Empty;
     #endregion
 
     #region Props
-    public string Value { get; set; }
-    public string OldValue { get; set; }
-    public EntityType EntityType { get; set; }
-    public CommandType CommandType { get; set; }
-    public FeatureName FeatureName { get; set; }
-    public ModuleName ModuleName { get; set; }
+    public string? EntityValue { get; set; }
+    public string? EntityNewValue { get; set; }
+    public string? EntityOldValue { get; set; }
+    public string? RepositoryName { get; set; }
+    public EntityName? Entity { get; set; }
+    public CommandType? CommandType { get; set; }
+    public FeatureName? Feature { get; set; }
+    public ModuleName? Module { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
     public DateTime? UpdatedOn { get; set; }

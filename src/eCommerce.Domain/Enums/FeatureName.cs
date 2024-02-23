@@ -4,4 +4,7 @@ public enum FeatureName
 {
     // Identity
     User,
+
+    // Shared
+    File
 }

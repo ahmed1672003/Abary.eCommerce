@@ -2,7 +2,7 @@
 
 public static class Registration
 {
-    public static IServiceCollection RegietrDomain(this IServiceCollection services)
+    public static IServiceCollection RegisterDomain(this IServiceCollection services)
     {
         return services;
     }

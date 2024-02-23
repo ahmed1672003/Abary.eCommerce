@@ -1,6 +1,6 @@
 ﻿namespace eCommerce.Domain.Entities.Identity;
 
-public class UserProfile
+public sealed class UserProfile
     : BaseEntity<Guid>,
         ITrackableCreate<Guid>,
         ISoftDeleteable,
@@ -13,7 +13,7 @@ public class UserProfile
 
     #region Keys
     public Guid? AddressId { get; set; }
-    public Guid? SocialId { get; set; }
+    public Guid UserId { get; set; }
     public Guid CreatedBy { get; set; } = Guid.Empty;
     public Guid DeletedBy { get; set; } = Guid.Empty;
     public Guid UpdatedBy { get; set; } = Guid.Empty;
