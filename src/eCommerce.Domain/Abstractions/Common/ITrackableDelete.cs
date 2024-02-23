@@ -1,4 +1,4 @@
-﻿namespace Pavon.Domain.Abstractions.Common;
+﻿namespace eCommerce.Domain.Abstractions.Common;
 
 public interface ITrackableDelete<TDeleter>
 {

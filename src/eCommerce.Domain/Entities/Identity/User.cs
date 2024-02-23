@@ -12,6 +12,7 @@ public sealed class User
     {
         Id = Guid.NewGuid();
         UserRoles = new(0);
+        Logins = new(0);
     }
     #endregion
 
@@ -31,5 +32,7 @@ public sealed class User
     #region Navigations
     public UserProfile Profile { get; set; }
     public List<UserRole> UserRoles { get; set; }
+    public List<UserLogin> Logins { get; set; }
+    public UserToken Token { get; set; }
     #endregion
 }

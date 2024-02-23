@@ -1,13 +1,12 @@
 ﻿namespace eCommerce.Domain.Enums;
 
-public enum EntityType
+public enum EntityName
 {
-    // Shared
     Address,
     FilMetaData,
     SocialMedia,
+    Notification,
 
-    // Identity
     User,
     UserProfile,
     Role,
@@ -15,4 +14,5 @@ public enum EntityType
     UserClaim,
     RoleClaim,
     UserLogin,
+    UserToken,
 }
