@@ -13,7 +13,7 @@ public static class Registration
         var dotenv = Path.Combine(parentRoot.FullName, ".env");
         Env.Load(dotenv);
         #endregion
-        var r = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
+
         #region DbContext Configurations
         services.AddDbContext<IeCommerceDbContext, eCommerceDbContext>(
             options =>

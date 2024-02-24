@@ -1,5 +1,6 @@
 ﻿namespace eCommerce.Domain.Entities.Identity;
 
+[Table(name: nameof(EntityName.UserClaim), Schema = nameof(ModuleName.Identity))]
 public sealed class UserClaim
     : IdentityUserClaim<Guid>,
         ITrackableCreate<Guid>,
@@ -8,6 +9,8 @@ public sealed class UserClaim
         ITrackableUpdate<Guid>
 {
     #region Keys
+    [ForeignKey(nameof(User))]
+    public override Guid UserId { get; set; }
     public Guid CreatedBy { get; set; } = Guid.Empty;
     public Guid DeletedBy { get; set; } = Guid.Empty;
     public Guid UpdatedBy { get; set; } = Guid.Empty;

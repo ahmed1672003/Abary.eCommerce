@@ -1,4 +1,5 @@
-﻿global using System.Net;
+﻿global using System.ComponentModel.DataAnnotations.Schema;
+global using System.Net;
 global using System.Text.Json.Serialization;
 global using eCommerce.Domain.Abstractions.Common;
 global using eCommerce.Domain.Abstractions.Specification;

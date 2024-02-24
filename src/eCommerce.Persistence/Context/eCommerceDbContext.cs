@@ -12,8 +12,6 @@ public sealed class eCommerceDbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
-        base.OnModelCreating(builder);
     }
 
     public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken ct) =>

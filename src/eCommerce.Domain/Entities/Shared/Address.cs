@@ -1,5 +1,7 @@
 ﻿namespace eCommerce.Domain.Entities.Shared;
 
+[Table(nameof(EntityName.Address), Schema = nameof(ModuleName.Shared))]
+[PrimaryKey(nameof(Id))]
 public sealed class Address
     : BaseEntity<Guid>,
         ITrackableCreate<Guid>,

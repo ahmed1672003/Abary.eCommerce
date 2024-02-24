@@ -1,5 +1,7 @@
 ﻿namespace eCommerce.Domain.Entities.Shared;
 
+[Table(nameof(EntityName.Notification), Schema = nameof(ModuleName.Shared))]
+[PrimaryKey(nameof(Id))]
 public sealed class Notification
     : BaseEntity<Guid>,
         ITrackableCreate<Guid>,

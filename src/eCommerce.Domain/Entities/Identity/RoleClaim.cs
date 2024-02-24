@@ -1,5 +1,7 @@
 ﻿namespace eCommerce.Domain.Entities.Identity;
 
+[Table(name: nameof(EntityName.RoleClaim), Schema = nameof(ModuleName.Identity))]
+[PrimaryKey(nameof(Id))]
 public sealed class RoleClaim
     : IdentityRoleClaim<Guid>,
         ITrackableCreate<Guid>,
@@ -11,6 +13,8 @@ public sealed class RoleClaim
     #endregion
 
     #region Keys
+    [ForeignKey(nameof(Role))]
+    public override Guid RoleId { get; set; }
     public Guid CreatedBy { get; set; } = Guid.Empty;
     public Guid DeletedBy { get; set; } = Guid.Empty;
     public Guid UpdatedBy { get; set; } = Guid.Empty;

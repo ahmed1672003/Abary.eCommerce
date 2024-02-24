@@ -1,5 +1,7 @@
 ﻿namespace eCommerce.Domain.Entities.Identity;
 
+[Table(name: nameof(EntityName.UserLogin), Schema = nameof(ModuleName.Identity))]
+[PrimaryKey(nameof(LoginProvider), nameof(ProviderKey))]
 public sealed class UserLogin
     : IdentityUserLogin<Guid>,
         ITrackableCreate<Guid>,
@@ -11,6 +13,8 @@ public sealed class UserLogin
     #endregion
 
     #region Keys
+    [ForeignKey(nameof(User))]
+    public override Guid UserId { get; set; }
     public Guid CreatedBy { get; set; } = Guid.Empty;
     public Guid DeletedBy { get; set; } = Guid.Empty;
     public Guid UpdatedBy { get; set; } = Guid.Empty;

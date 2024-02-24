@@ -1,5 +1,7 @@
 ﻿namespace eCommerce.Domain.Entities.Identity;
 
+[Table(name: nameof(EntityName.UserRole), Schema = nameof(ModuleName.Identity))]
+[PrimaryKey(nameof(UserId), nameof(RoleId))]
 public sealed class UserRole
     : IdentityUserRole<Guid>,
         ITrackableCreate<Guid>,
@@ -12,8 +14,16 @@ public sealed class UserRole
     #endregion
 
     #region Keys
+    [ForeignKey(nameof(User))]
+    public override Guid UserId { get; set; }
+
+    [ForeignKey(nameof(Role))]
+    public override Guid RoleId { get; set; }
+
     public Guid CreatedBy { get; set; } = Guid.Empty;
+
     public Guid DeletedBy { get; set; } = Guid.Empty;
+
     public Guid UpdatedBy { get; set; } = Guid.Empty;
     #endregion
 
@@ -26,6 +36,7 @@ public sealed class UserRole
 
     #region Navigations
     public User User { get; set; }
+
     public Role Role { get; set; }
     #endregion
 }

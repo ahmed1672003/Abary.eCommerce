@@ -30,7 +30,6 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
                         .HasColumnType("text");
 
                     b.Property<Guid>("CreatedBy")
@@ -49,12 +48,10 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uuid");
@@ -64,11 +61,7 @@ namespace eCommerce.Persistence.Context.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
-
-                    b.ToTable("AspNetRoles", (string)null);
+                    b.ToTable("Role", "Identity");
                 });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.RoleClaim", b =>
@@ -103,9 +96,6 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("RoleId1")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uuid");
 
@@ -116,9 +106,7 @@ namespace eCommerce.Persistence.Context.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.HasIndex("RoleId1");
-
-                    b.ToTable("AspNetRoleClaims", (string)null);
+                    b.ToTable("RoleClaim", "Identity");
                 });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.User", b =>
@@ -131,7 +119,6 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
                         .HasColumnType("text");
 
                     b.Property<Guid>("CreatedBy")
@@ -147,8 +134,7 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
@@ -163,12 +149,10 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
@@ -192,19 +176,11 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
-
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("User", "Identity");
                 });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserClaim", b =>
@@ -245,16 +221,11 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("UserId1")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("UserId1");
-
-                    b.ToTable("AspNetUserClaims", (string)null);
+                    b.ToTable("UserClaim", "Identity");
                 });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserLogin", b =>
@@ -292,16 +263,11 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("UserId1")
-                        .HasColumnType("uuid");
-
                     b.HasKey("LoginProvider", "ProviderKey");
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("UserId1");
-
-                    b.ToTable("AspNetUserLogins", (string)null);
+                    b.ToTable("UserLogin", "Identity");
                 });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserProfile", b =>
@@ -334,11 +300,11 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<string>("LastName")
                         .HasColumnType("text");
 
-                    b.Property<int>("MyProperty")
-                        .HasColumnType("integer");
-
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("text");
+
+                    b.Property<Guid?>("SocialMediaId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uuid");
@@ -352,6 +318,9 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId")
+                        .IsUnique();
+
+                    b.HasIndex("SocialMediaId")
                         .IsUnique();
 
                     b.HasIndex("UserId")
@@ -383,36 +352,26 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid?>("RoleId1")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("UserId1")
-                        .HasColumnType("uuid");
-
                     b.HasKey("UserId", "RoleId");
 
                     b.HasIndex("RoleId");
 
-                    b.HasIndex("RoleId1");
-
-                    b.HasIndex("UserId1");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
+                    b.ToTable("UserRole", "Identity");
                 });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserToken", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("LoginProvider")
                         .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -438,17 +397,14 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("UserId1")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Value")
                         .HasColumnType("text");
 
-                    b.HasKey("UserId", "LoginProvider", "Name");
+                    b.HasKey("LoginProvider", "UserId", "Name");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserTokens", (string)null);
+                    b.ToTable("UserToken", "Identity");
                 });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Shared.Address", b =>
@@ -520,6 +476,7 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Extension")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
@@ -535,6 +492,7 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Url")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -620,18 +578,22 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<List<string>>("Facebook")
+                        .IsRequired()
                         .HasColumnType("text[]");
 
                     b.Property<List<string>>("Instagram")
+                        .IsRequired()
                         .HasColumnType("text[]");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
                     b.Property<List<string>>("Threads")
+                        .IsRequired()
                         .HasColumnType("text[]");
 
                     b.Property<List<string>>("TikTock")
+                        .IsRequired()
                         .HasColumnType("text[]");
 
                     b.Property<Guid>("UpdatedBy")
@@ -644,60 +606,47 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<List<string>>("WhatsApp")
+                        .IsRequired()
                         .HasColumnType("text[]");
 
                     b.Property<List<string>>("X")
+                        .IsRequired()
                         .HasColumnType("text[]");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserProfileId")
-                        .IsUnique();
 
                     b.ToTable("SocialMedia", "Shared");
                 });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.RoleClaim", b =>
                 {
-                    b.HasOne("eCommerce.Domain.Entities.Identity.Role", null)
-                        .WithMany()
+                    b.HasOne("eCommerce.Domain.Entities.Identity.Role", "Role")
+                        .WithMany("Claims")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("eCommerce.Domain.Entities.Identity.Role", "Role")
-                        .WithMany("Claims")
-                        .HasForeignKey("RoleId1");
 
                     b.Navigation("Role");
                 });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserClaim", b =>
                 {
-                    b.HasOne("eCommerce.Domain.Entities.Identity.User", null)
+                    b.HasOne("eCommerce.Domain.Entities.Identity.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("eCommerce.Domain.Entities.Identity.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserLogin", b =>
                 {
-                    b.HasOne("eCommerce.Domain.Entities.Identity.User", null)
-                        .WithMany()
+                    b.HasOne("eCommerce.Domain.Entities.Identity.User", "User")
+                        .WithMany("Logins")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("eCommerce.Domain.Entities.Identity.User", "User")
-                        .WithMany("Logins")
-                        .HasForeignKey("UserId1");
 
                     b.Navigation("User");
                 });
@@ -708,6 +657,10 @@ namespace eCommerce.Persistence.Context.Migrations
                         .WithOne("UserProfile")
                         .HasForeignKey("eCommerce.Domain.Entities.Identity.UserProfile", "AddressId");
 
+                    b.HasOne("eCommerce.Domain.Entities.Shared.SocialMedia", "SocialMedia")
+                        .WithOne("UserProfile")
+                        .HasForeignKey("eCommerce.Domain.Entities.Identity.UserProfile", "SocialMediaId");
+
                     b.HasOne("eCommerce.Domain.Entities.Identity.User", "User")
                         .WithOne("Profile")
                         .HasForeignKey("eCommerce.Domain.Entities.Identity.UserProfile", "UserId")
@@ -716,30 +669,24 @@ namespace eCommerce.Persistence.Context.Migrations
 
                     b.Navigation("Address");
 
+                    b.Navigation("SocialMedia");
+
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserRole", b =>
                 {
-                    b.HasOne("eCommerce.Domain.Entities.Identity.Role", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("eCommerce.Domain.Entities.Identity.Role", "Role")
                         .WithMany("RoleUsers")
-                        .HasForeignKey("RoleId1");
-
-                    b.HasOne("eCommerce.Domain.Entities.Identity.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("eCommerce.Domain.Entities.Identity.User", "User")
                         .WithMany("UserRoles")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Role");
 
@@ -748,26 +695,13 @@ namespace eCommerce.Persistence.Context.Migrations
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserToken", b =>
                 {
-                    b.HasOne("eCommerce.Domain.Entities.Identity.User", null)
-                        .WithMany()
+                    b.HasOne("eCommerce.Domain.Entities.Identity.User", "User")
+                        .WithMany("Tokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("eCommerce.Domain.Entities.Identity.User", "User")
-                        .WithMany("Tokens")
-                        .HasForeignKey("UserId1");
-
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("eCommerce.Domain.Entities.Shared.SocialMedia", b =>
-                {
-                    b.HasOne("eCommerce.Domain.Entities.Identity.UserProfile", "UserProfile")
-                        .WithOne("Social")
-                        .HasForeignKey("eCommerce.Domain.Entities.Shared.SocialMedia", "UserProfileId");
-
-                    b.Navigation("UserProfile");
                 });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.Role", b =>
@@ -781,21 +715,24 @@ namespace eCommerce.Persistence.Context.Migrations
                 {
                     b.Navigation("Logins");
 
-                    b.Navigation("Profile");
+                    b.Navigation("Profile")
+                        .IsRequired();
 
                     b.Navigation("Tokens");
 
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserProfile", b =>
-                {
-                    b.Navigation("Social");
-                });
-
             modelBuilder.Entity("eCommerce.Domain.Entities.Shared.Address", b =>
                 {
-                    b.Navigation("UserProfile");
+                    b.Navigation("UserProfile")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("eCommerce.Domain.Entities.Shared.SocialMedia", b =>
+                {
+                    b.Navigation("UserProfile")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

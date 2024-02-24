@@ -1,5 +1,7 @@
 ﻿namespace eCommerce.Domain.Entities.Identity;
 
+[Table(nameof(EntityName.Role), Schema = nameof(ModuleName.Identity))]
+[PrimaryKey(nameof(Id))]
 public sealed class Role
     : IdentityRole<Guid>,
         ITrackableCreate<Guid>,
