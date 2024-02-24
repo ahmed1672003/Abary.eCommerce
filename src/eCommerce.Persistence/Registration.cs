@@ -1,4 +1,6 @@
-﻿namespace eCommerce.Persistence;
+﻿using eCommerce.Persistence.Settings;
+
+namespace eCommerce.Persistence;
 
 public static class Registration
 {
@@ -14,7 +16,6 @@ public static class Registration
         Env.Load(dotenv);
         #endregion
 
-        #region DbContext Configurations
         services.AddDbContext<IeCommerceDbContext, eCommerceDbContext>(
             options =>
             {
@@ -23,7 +24,6 @@ public static class Registration
             },
             ServiceLifetime.Scoped
         );
-
         services
             .AddIdentity<User, Role>(options =>
             {
@@ -136,14 +136,10 @@ public static class Registration
                 }
             );
         });
-        #endregion
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
-        #region Repositories
-        services
-            .AddScoped(typeof(IRepository<>), typeof(Repository<>))
-            .AddScoped<IUserRepository, UserRepository>();
-        #endregion
-
+        services.AddSingleton<JwtSettings>();
+        services.Configure<JwtSettings>(config.GetSection(nameof(JwtSettings)));
         return services;
     }
 }

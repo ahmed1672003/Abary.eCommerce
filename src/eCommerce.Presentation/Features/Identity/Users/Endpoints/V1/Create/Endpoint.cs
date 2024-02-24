@@ -1,12 +1,15 @@
-﻿namespace eCommerce.Presentation.Identity.Features.User.Endpoints.V1.Create;
+﻿using eCommerce.Presentation.Features.Identity.Users.Service;
+using FastEndpoints;
+
+namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Create;
 
 public sealed class CreateUserEndpoint : Endpoint<CreateUserRequest, Response>
 {
     public override void Configure()
     {
-        Get($"{ModuleName.Identity}/{FeatureName.User}/{nameof(Create)}");
+        Post($"{ModuleName.Identity}/{FeatureName.User}/{nameof(Create)}");
         Version(1);
-        Permissions();
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CreateUserRequest req, CancellationToken ct) =>

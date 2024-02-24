@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\eCommerce.Persistence\eCommerce.Persistence.csproj" />
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Identity\Features\User\Dto\" />
+    <ProjectReference Include="..\eCommerce.Persistence\eCommerce.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

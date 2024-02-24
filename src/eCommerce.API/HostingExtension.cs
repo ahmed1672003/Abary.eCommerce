@@ -13,7 +13,7 @@ public static class HostingExtension
         service
             .RegisterDomain()
             .RegisterePersistence(builder.Configuration)
-            .RegisterPresentation(builder.Configuration)
+            .RegisterPresentation()
             .AddEndpointsApiExplorer()
             .AddControllers()
             .AddApplicationPart(typeof(Presentation.Registeration).Assembly)

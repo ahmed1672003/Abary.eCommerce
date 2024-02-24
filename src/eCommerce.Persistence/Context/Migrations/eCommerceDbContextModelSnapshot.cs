@@ -545,7 +545,7 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<int?>("Module")
                         .HasColumnType("integer");
 
-                    b.Property<string>("RepositoryName")
+                    b.Property<string>("ServiceName")
                         .HasColumnType("text");
 
                     b.Property<Guid>("UpdatedBy")
@@ -632,7 +632,7 @@ namespace eCommerce.Persistence.Context.Migrations
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserClaim", b =>
                 {
                     b.HasOne("eCommerce.Domain.Entities.Identity.User", "User")
-                        .WithMany()
+                        .WithMany("Claims")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -713,6 +713,8 @@ namespace eCommerce.Persistence.Context.Migrations
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.User", b =>
                 {
+                    b.Navigation("Claims");
+
                     b.Navigation("Logins");
 
                     b.Navigation("Profile")

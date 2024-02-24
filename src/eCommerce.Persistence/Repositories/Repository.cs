@@ -72,7 +72,7 @@ public class Repository<TEntity> : IRepository<TEntity>
         }
         catch (Exception ex)
         {
-            throw new DatabaseExecuteQueryException(ex.Message);
+            throw new DatabaseExecuteQueryException(ex.Message, ex);
         }
     }
 
@@ -89,7 +89,7 @@ public class Repository<TEntity> : IRepository<TEntity>
         }
         catch (Exception ex)
         {
-            throw new DatabaseExecuteQueryException(ex.Message);
+            throw new DatabaseExecuteQueryException(ex.Message, ex);
         }
     }
 
@@ -101,13 +101,13 @@ public class Repository<TEntity> : IRepository<TEntity>
         try
         {
             if (specification is not null && specification is not { Criteria: null })
-                return _entities.CountAsync(specification.Criteria);
+                return _entities.CountAsync(specification.Criteria, ct);
             else
-                return _entities.CountAsync();
+                return _entities.CountAsync(ct);
         }
         catch (Exception ex)
         {
-            throw new DatabaseExecuteQueryException(ex.Message);
+            throw new DatabaseExecuteQueryException(ex.Message, ex);
         }
     }
     #endregion

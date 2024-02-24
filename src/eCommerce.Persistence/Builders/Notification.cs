@@ -10,9 +10,9 @@ public sealed class NotificationBuilder
         return this;
     }
 
-    public NotificationBuilder WithRepositoryName(string repositoryName)
+    public NotificationBuilder WithServiceName(string serviceName)
     {
-        _notification.RepositoryName = repositoryName;
+        _notification.ServiceName = serviceName;
         return this;
     }
 

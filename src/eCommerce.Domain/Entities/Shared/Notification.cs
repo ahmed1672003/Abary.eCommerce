@@ -24,7 +24,7 @@ public sealed class Notification
     public string? EntityValue { get; set; }
     public string? EntityNewValue { get; set; }
     public string? EntityOldValue { get; set; }
-    public string? RepositoryName { get; set; }
+    public string? ServiceName { get; set; }
     public EntityName? Entity { get; set; }
     public CommandType? CommandType { get; set; }
     public FeatureName? Feature { get; set; }

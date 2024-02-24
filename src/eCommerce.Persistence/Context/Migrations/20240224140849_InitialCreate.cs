@@ -79,7 +79,7 @@ namespace eCommerce.Persistence.Context.Migrations
                     EntityValue = table.Column<string>(type: "text", nullable: true),
                     EntityNewValue = table.Column<string>(type: "text", nullable: true),
                     EntityOldValue = table.Column<string>(type: "text", nullable: true),
-                    RepositoryName = table.Column<string>(type: "text", nullable: true),
+                    ServiceName = table.Column<string>(type: "text", nullable: true),
                     Entity = table.Column<int>(type: "integer", nullable: true),
                     CommandType = table.Column<int>(type: "integer", nullable: true),
                     Feature = table.Column<int>(type: "integer", nullable: true),

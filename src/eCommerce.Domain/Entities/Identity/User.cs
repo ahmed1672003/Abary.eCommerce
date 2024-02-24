@@ -14,6 +14,7 @@ public sealed class User
         Id = Guid.NewGuid();
         UserRoles = new(0);
         Logins = new(0);
+        Claims = new(0);
     }
     #endregion
 
@@ -35,5 +36,6 @@ public sealed class User
     public List<UserRole> UserRoles { get; set; }
     public List<UserLogin> Logins { get; set; }
     public List<UserToken> Tokens { get; set; }
+    public List<UserClaim> Claims { get; set; }
     #endregion
 }

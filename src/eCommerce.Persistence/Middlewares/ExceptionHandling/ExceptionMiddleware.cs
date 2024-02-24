@@ -26,7 +26,7 @@ public sealed class ExceptionMiddleware : IMiddleware
             IsSuccess = false
         };
 
-        var result = JsonSerializer.Serialize(response);
+        var result = JsonConvert.SerializeObject(response);
 
         return httpContext.Response.WriteAsync(result);
     }

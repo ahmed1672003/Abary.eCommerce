@@ -1,15 +1,41 @@
-﻿namespace eCommerce.Presentation;
+﻿using System.Reflection;
+using eCommerce.Domain.Entities.Identity;
+using eCommerce.Persistence.Middlewares.ExceptionHandling;
+using eCommerce.Presentation.Features.Identity.Users.DaoService;
+using eCommerce.Presentation.Features.Identity.Users.Service;
+using eCommerce.Presentation.Json.Service;
+using eCommerce.Presentation.Jwt.Service;
+using FastEndpoints;
+using Microsoft.AspNetCore.Identity;
+
+namespace eCommerce.Presentation;
 
 public static class Registeration
 {
-    public static IServiceCollection RegisterPresentation(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
+    public static IServiceCollection RegisterPresentation(this IServiceCollection services)
     {
-        services.AddScoped<IUserService, UserService>();
+        services.AddHttpContextAccessor();
+        services.AddSingleton<ExceptionMiddleware>();
 
+        // Mapper
+        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+        // DaoService
+        services.AddScoped<IUserDaoService, UserDaoService>();
+
+        // Service
+        services
+            .AddScoped<IUserService, UserService>()
+            .AddScoped<IJwtService, JwtService>()
+            .AddScoped<UserManager<User>>()
+            .AddScoped<RoleManager<Role>>()
+            .AddScoped<SignInManager<User>>()
+            .AddScoped<IJsonService, JsonService>();
+
+        // Fastendpoints
         services.AddFastEndpoints();
+
+        // Swagger
         services.SwaggerDocument(o =>
         {
             o.DocumentSettings = s =>
