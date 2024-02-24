@@ -2,17 +2,15 @@
 
 public static class HostingExtension
 {
-    public static WebApplication RegisterApi(
+    public static async Task<WebApplication> RegisterApiAsync(
         this IServiceCollection service,
         WebApplicationBuilder builder
     )
     {
         service.AddHttpContextAccessor();
         service.AddAuthentication();
-
         service
             .RegisterDomain()
-            .RegisterePersistence(builder.Configuration)
             .RegisterPresentation()
             .AddEndpointsApiExplorer()
             .AddControllers()
@@ -20,6 +18,8 @@ public static class HostingExtension
             .AddJsonOptions(options =>
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
             );
+
+        await service.RegisterePersistence(builder.Configuration);
         return builder.Build();
     }
 

@@ -95,6 +95,28 @@ namespace eCommerce.Persistence.Context.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Permission",
+                schema: "Identity",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    Entity = table.Column<int>(type: "integer", nullable: false),
+                    Module = table.Column<int>(type: "integer", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Permission", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Role",
                 schema: "Identity",
                 columns: table => new
@@ -265,6 +287,40 @@ namespace eCommerce.Persistence.Context.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserPermission",
+                schema: "Identity",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PermissionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserPermission", x => new { x.PermissionId, x.UserId });
+                    table.ForeignKey(
+                        name: "FK_UserPermission_Permission_PermissionId",
+                        column: x => x.PermissionId,
+                        principalSchema: "Identity",
+                        principalTable: "Permission",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserPermission_User_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "Identity",
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserProfile",
                 schema: "Identity",
                 columns: table => new
@@ -390,6 +446,12 @@ namespace eCommerce.Persistence.Context.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserPermission_UserId",
+                schema: "Identity",
+                table: "UserPermission",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserProfile_AddressId",
                 schema: "Identity",
                 table: "UserProfile",
@@ -447,6 +509,10 @@ namespace eCommerce.Persistence.Context.Migrations
                 schema: "Identity");
 
             migrationBuilder.DropTable(
+                name: "UserPermission",
+                schema: "Identity");
+
+            migrationBuilder.DropTable(
                 name: "UserProfile",
                 schema: "Identity");
 
@@ -456,6 +522,10 @@ namespace eCommerce.Persistence.Context.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserToken",
+                schema: "Identity");
+
+            migrationBuilder.DropTable(
+                name: "Permission",
                 schema: "Identity");
 
             migrationBuilder.DropTable(

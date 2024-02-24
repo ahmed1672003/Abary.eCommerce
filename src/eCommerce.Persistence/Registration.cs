@@ -1,10 +1,13 @@
-﻿using eCommerce.Persistence.Settings;
+﻿using eCommerce.Persistence.Seeders;
+using eCommerce.Persistence.Seeding;
+using eCommerce.Persistence.Settings;
+using FastEndpoints;
 
 namespace eCommerce.Persistence;
 
 public static class Registration
 {
-    public static IServiceCollection RegisterePersistence(
+    public static async Task<IServiceCollection> RegisterePersistence(
         this IServiceCollection services,
         IConfiguration config
     )
@@ -140,6 +143,26 @@ public static class Registration
 
         services.AddSingleton<JwtSettings>();
         services.Configure<JwtSettings>(config.GetSection(nameof(JwtSettings)));
+
+        var servicProvider = services.BuildServiceProvider();
+        using (var scope = servicProvider.CreateScope())
+        {
+            using (var context = scope.Resolve<IeCommerceDbContext>())
+            {
+                var userManager = scope.Resolve<UserManager<User>>();
+                var permissions = context.Set<Permission>();
+
+                if (!await permissions.AnyAsync())
+                {
+                    await PermissionSeeder.SeedPermissionsAsync(context);
+                }
+
+                if (!await userManager.Users.AnyAsync())
+                {
+                    await UserSeeder.SeedAsync(context, userManager);
+                }
+            }
+        }
         return services;
     }
 }

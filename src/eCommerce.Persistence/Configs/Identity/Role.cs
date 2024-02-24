@@ -1,6 +1,6 @@
 ﻿namespace eCommerce.Persistence.Configs.Identity;
 
-public sealed class RoleConfig : IEntityTypeConfiguration<Role>
+internal sealed class RoleConfig : IEntityTypeConfiguration<Role>
 {
     public void Configure(EntityTypeBuilder<Role> builder)
     {

@@ -19,6 +19,7 @@ public sealed class JwtService : IJwtService
     readonly IRepository<UserClaim> _userClaimRepository;
     readonly IRepository<Role> _roleRepository;
     readonly IRepository<UserRole> _userRoleRepository;
+    readonly IRepository<UserPermission> _userPermissionRepository;
 
     readonly JwtSettings _jwtSettings;
 
@@ -27,7 +28,8 @@ public sealed class JwtService : IJwtService
         IRepository<User> userRepository,
         IRepository<UserClaim> userClaimRepository,
         IRepository<Role> roleRepository,
-        IRepository<UserRole> userRoleRepository
+        IRepository<UserRole> userRoleRepository,
+        IRepository<UserPermission> userPermissionRepository
     )
     {
         _options = options;
@@ -36,6 +38,7 @@ public sealed class JwtService : IJwtService
         _userClaimRepository = userClaimRepository;
         _roleRepository = roleRepository;
         _userRoleRepository = userRoleRepository;
+        _userPermissionRepository = userPermissionRepository;
     }
 
     public async Task<TokenDto> GenerateTokenAsync(User user, CancellationToken ct)
@@ -102,7 +105,25 @@ public sealed class JwtService : IJwtService
         foreach (var userRole in await userRoles.ToListAsync(ct))
             claims.AddRange(userRole.Role.Claims.Select(x => x.ToClaim()));
 
-        return claims.DistinctBy(x => x.Type).ToList();
+        var userPermissionSpecification = new SpecificationBuilder<UserPermission>()
+            .HasCriteria(x => x.UserId == user.Id)
+            .HasInclude(x => x.Permission)
+            .HasOrderBy(x => x.Permission.Module)
+            .Build();
+
+        var userPermissions = await _userPermissionRepository.GetAllAsync(
+            userPermissionSpecification,
+            ct
+        );
+
+        claims.AddRange(
+            userPermissions.Select(x => new Claim(
+                CustomeClaimTypes.Permissions.ToString(),
+                x.Permission.Value
+            ))
+        );
+
+        return claims;
     }
     #endregion
 }

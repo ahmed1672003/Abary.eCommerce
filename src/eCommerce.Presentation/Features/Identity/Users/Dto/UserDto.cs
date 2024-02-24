@@ -6,6 +6,7 @@ public sealed record UserDto
     public string UserName { get; set; }
     public string Email { get; set; }
     public DateTime CreatedOn { get; set; }
+    public UserProfileDto Profile { get; set; }
 
     public sealed record UserProfileDto
     {

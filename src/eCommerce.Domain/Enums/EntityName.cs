@@ -15,4 +15,6 @@ public enum EntityName
     RoleClaim,
     UserLogin,
     UserToken,
+    UserPermission,
+    Permission
 }

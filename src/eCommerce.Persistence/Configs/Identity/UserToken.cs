@@ -1,6 +1,6 @@
 ﻿namespace eCommerce.Persistence.Configs.Identity;
 
-public sealed class UserTokenConfig : IEntityTypeConfiguration<UserToken>
+internal sealed class UserTokenConfig : IEntityTypeConfiguration<UserToken>
 {
     public void Configure(EntityTypeBuilder<UserToken> builder)
     {

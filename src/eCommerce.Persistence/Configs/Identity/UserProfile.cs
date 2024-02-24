@@ -1,6 +1,6 @@
 ﻿namespace eCommerce.Persistence.Configs.Identity;
 
-public sealed class UserProfileConfig : IEntityTypeConfiguration<UserProfile>
+internal sealed class UserProfileConfig : IEntityTypeConfiguration<UserProfile>
 {
     public void Configure(EntityTypeBuilder<UserProfile> builder)
     {

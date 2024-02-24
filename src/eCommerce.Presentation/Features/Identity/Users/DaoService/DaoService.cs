@@ -1,4 +1,5 @@
-﻿using eCommerce.Domain.Abstractions.Contexts;
+﻿using System.ComponentModel.DataAnnotations;
+using eCommerce.Domain.Abstractions.Contexts;
 using eCommerce.Domain.Abstractions.Repositories;
 using eCommerce.Domain.Constants;
 using eCommerce.Domain.Entities.Identity;
@@ -7,9 +8,12 @@ using eCommerce.Domain.Exceptions;
 using eCommerce.Persistence.Builders;
 using eCommerce.Presentation.Features.Identity.Users.Dto;
 using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Create;
+using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Login;
 using eCommerce.Presentation.Json.Service;
+using eCommerce.Presentation.Jwt.Dto;
 using eCommerce.Presentation.Jwt.Service;
 using Microsoft.AspNetCore.Identity;
+using Pavon.Persistence.Builders;
 
 namespace eCommerce.Presentation.Features.Identity.Users.DaoService;
 
@@ -63,17 +67,6 @@ public sealed class UserDaoService : IUserDaoService
 
             var user = _mapper.Map<User>(request);
 
-            if (user.Profile != null)
-            {
-                modifiedRows++;
-                if (user.Profile.Address != null)
-                {
-                    modifiedRows++;
-                }
-            }
-
-            modifiedRows++;
-            user = await _userRepository.CreateAsync(user, ct);
             var jsonModel = await _jsonService.SeralizeAsync(user, ct);
 
             await _userManager.CreateAsync(user, request.Password);
@@ -116,5 +109,31 @@ public sealed class UserDaoService : IUserDaoService
             await transaction.RollbackAsync(ct);
             throw new DatabaseTransactionException(ex.Message);
         }
+    }
+
+    public async Task<Response> LoginAsync(LoginUserRequest request, CancellationToken ct)
+    {
+        var specification = new SpecificationBuilder<User>()
+            .HasCriteria(x =>
+                new EmailAddressAttribute().IsValid(request.EmailOrUserName)
+                    ? x.Email == request.EmailOrUserName
+                    : x.UserName == request.EmailOrUserName
+            )
+            .HasIncludeString(
+                $"{nameof(User.UserRoles)}.{nameof(UserRole.Role)}.{nameof(Role.Claims)}"
+            )
+            .HasIncludeString($"{nameof(User.UserPremissions)}.{nameof(UserPermission.Permission)}")
+            .HasInclude(x => x.Claims)
+            .Build();
+
+        var user = await _userRepository.GetAsync(specification, ct);
+        var token = await _jwtService.GenerateTokenAsync(user, ct);
+
+        return new Response<TokenDto>()
+        {
+            IsSuccess = true,
+            Message = _success,
+            Result = token,
+        };
     }
 }

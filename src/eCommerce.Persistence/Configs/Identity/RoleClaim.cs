@@ -1,6 +1,6 @@
 ﻿namespace eCommerce.Persistence.Configs.Identity;
 
-public sealed class RoleClaimConfig : IEntityTypeConfiguration<RoleClaim>
+internal sealed class RoleClaimConfig : IEntityTypeConfiguration<RoleClaim>
 {
     public void Configure(EntityTypeBuilder<RoleClaim> builder)
     {

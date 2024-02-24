@@ -13,7 +13,7 @@ using eCommerce.Persistence.Context;
 namespace eCommerce.Persistence.Context.Migrations
 {
     [DbContext(typeof(eCommerceDbContext))]
-    [Migration("20240224140849_InitialCreate")]
+    [Migration("20240224220118_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -25,6 +25,48 @@ namespace eCommerce.Persistence.Context.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("eCommerce.Domain.Entities.Identity.Permission", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Entity")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Module")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Permission", "Identity");
+                });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.Role", b =>
                 {
@@ -271,6 +313,42 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserLogin", "Identity");
+                });
+
+            modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserPermission", b =>
+                {
+                    b.Property<Guid>("PermissionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("PermissionId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserPermission", "Identity");
                 });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserProfile", b =>
@@ -654,6 +732,25 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserPermission", b =>
+                {
+                    b.HasOne("eCommerce.Domain.Entities.Identity.Permission", "Permission")
+                        .WithMany("PermissionUsers")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("eCommerce.Domain.Entities.Identity.User", "User")
+                        .WithMany("UserPremissions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserProfile", b =>
                 {
                     b.HasOne("eCommerce.Domain.Entities.Shared.Address", "Address")
@@ -707,6 +804,11 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("eCommerce.Domain.Entities.Identity.Permission", b =>
+                {
+                    b.Navigation("PermissionUsers");
+                });
+
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.Role", b =>
                 {
                     b.Navigation("Claims");
@@ -724,6 +826,8 @@ namespace eCommerce.Persistence.Context.Migrations
                         .IsRequired();
 
                     b.Navigation("Tokens");
+
+                    b.Navigation("UserPremissions");
 
                     b.Navigation("UserRoles");
                 });

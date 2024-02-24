@@ -21,4 +21,7 @@ public sealed class eCommerceDbContext
         await SaveChangesAsync(ct) == modifiedRows;
 
     public bool IsDone(int modifiedRows) => SaveChanges() == modifiedRows;
+
+    public Task<bool> EnsureCreatedAsync(CancellationToken ct = default) =>
+        this.Database.EnsureCreatedAsync(ct);
 }

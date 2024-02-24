@@ -1,8 +1,10 @@
 ﻿namespace eCommerce.Domain.Abstractions.Contexts;
 
-public interface IeCommerceDbContext
+public interface IeCommerceDbContext : IAsyncDisposable, IDisposable
 {
     Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken ct);
+
+    Task<bool> EnsureCreatedAsync(CancellationToken ct = default);
 
     DbSet<TEntity> Set<TEntity>()
         where TEntity : class;
@@ -10,6 +12,4 @@ public interface IeCommerceDbContext
     Task<bool> IsDoneAsync(int modifiedRows, CancellationToken ct);
 
     bool IsDone(int modifiedRows);
-
-    ValueTask DisposeAsync();
 }

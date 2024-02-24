@@ -36,5 +36,15 @@ public sealed class CreateUserValidator : Validator<CreateUserRequest>
                     return !await users.AnyAsync(x => x.Email == req.Email, ct);
                 }
             );
+
+        RuleFor(x => x)
+            .MustAsync(
+                async (req, ct) =>
+                {
+                    var users = Resolve<IeCommerceDbContext>().Set<User>();
+
+                    return !await users.AnyAsync(x => x.UserName == req.UserName, ct);
+                }
+            );
     }
 }

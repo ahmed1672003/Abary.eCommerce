@@ -15,6 +15,7 @@ public sealed class User
         UserRoles = new(0);
         Logins = new(0);
         Claims = new(0);
+        UserPremissions = new(0);
     }
     #endregion
 
@@ -37,5 +38,6 @@ public sealed class User
     public List<UserLogin> Logins { get; set; }
     public List<UserToken> Tokens { get; set; }
     public List<UserClaim> Claims { get; set; }
+    public List<UserPermission> UserPremissions { get; set; }
     #endregion
 }
