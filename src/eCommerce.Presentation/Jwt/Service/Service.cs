@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using eCommerce.Domain.Abstractions.Contexts;
 using eCommerce.Domain.Abstractions.Repositories;
 using eCommerce.Domain.Entities.Identity;
 using eCommerce.Persistence.Settings;
@@ -8,20 +9,20 @@ using eCommerce.Presentation.Jwt.Dto;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Pavon.Persistence.Builders;
 
 namespace eCommerce.Presentation.Jwt.Service;
 
 public sealed class JwtService : IJwtService
 {
     readonly IOptions<JwtSettings> _options;
-    readonly IRepository<User> _userRepository;
-    readonly IRepository<UserClaim> _userClaimRepository;
-    readonly IRepository<Role> _roleRepository;
-    readonly IRepository<UserRole> _userRoleRepository;
-    readonly IRepository<UserPermission> _userPermissionRepository;
-
+    readonly IeCommerceDbContext _context;
     readonly JwtSettings _jwtSettings;
+
+    readonly DbSet<User> _users;
+    readonly DbSet<UserClaim> _userClaims;
+    readonly DbSet<Role> _roles;
+    readonly DbSet<UserRole> _userRoles;
+    readonly DbSet<UserPermission> _userPermissions;
 
     public JwtService(
         IOptions<JwtSettings> options,
@@ -29,21 +30,23 @@ public sealed class JwtService : IJwtService
         IRepository<UserClaim> userClaimRepository,
         IRepository<Role> roleRepository,
         IRepository<UserRole> userRoleRepository,
-        IRepository<UserPermission> userPermissionRepository
+        IRepository<UserPermission> userPermissionRepository,
+        IeCommerceDbContext context
     )
     {
         _options = options;
         _jwtSettings = options.Value;
-        _userRepository = userRepository;
-        _userClaimRepository = userClaimRepository;
-        _roleRepository = roleRepository;
-        _userRoleRepository = userRoleRepository;
-        _userPermissionRepository = userPermissionRepository;
+        _context = context;
+        _users = _context.Set<User>();
+        _userClaims = _context.Set<UserClaim>();
+        _roles = _context.Set<Role>();
+        _userRoles = _context.Set<UserRole>();
+        _userPermissions = _context.Set<UserPermission>();
     }
 
     public async Task<TokenDto> GenerateTokenAsync(User user, CancellationToken ct)
     {
-        var expire = DateTime.Now.AddMinutes(_jwtSettings.AccessTokenExpireDate);
+        var expire = DateTime.Now.AddDays(_jwtSettings.AccessTokenExpireDate);
         var symmetricSecurityKey = new SymmetricSecurityKey(
             Encoding.ASCII.GetBytes(_jwtSettings.Secret)
         );
@@ -63,7 +66,7 @@ public sealed class JwtService : IJwtService
     }
 
     #region Helpers
-    private async Task<IEnumerable<Claim>> GetUserClaimsAsync(User user, CancellationToken ct)
+    private Task<IEnumerable<Claim>> GetUserClaimsAsync(User user, CancellationToken ct)
     {
         var claims = new List<Claim>(0);
 
@@ -79,51 +82,21 @@ public sealed class JwtService : IJwtService
         if (!string.IsNullOrEmpty(user.PhoneNumber))
             claims.Add(new(CustomeClaimTypes.PhoneNumber.ToString(), user.PhoneNumber));
 
-        claims.AddRange(await GenerateUserClaimsAsync(user, ct));
+        claims.AddRange(user.Claims.Select(x => x.ToClaim()));
 
-        return claims;
-    }
-
-    private async Task<List<Claim>> GenerateUserClaimsAsync(User user, CancellationToken ct)
-    {
-        var claims = new List<Claim>(0);
-
-        var userPermissionsSpecification = new SpecificationBuilder<UserClaim>()
-            .HasCriteria(x => x.UserId == user.Id)
-            .Build();
-
-        var userClaims = await _userClaimRepository.GetAllAsync(userPermissionsSpecification, ct);
-        claims.AddRange(await userClaims.Select(x => x.ToClaim()).ToListAsync(ct));
-
-        var userRolesSpecification = new SpecificationBuilder<UserRole>()
-            .HasCriteria(x => x.UserId == user.Id)
-            .HasIncludeString($"{nameof(UserRole.Role)}.{nameof(Role.Claims)}")
-            .Build();
-
-        var userRoles = await _userRoleRepository.GetAllAsync(userRolesSpecification, ct);
-
-        foreach (var userRole in await userRoles.ToListAsync(ct))
+        foreach (var userRole in user.UserRoles)
             claims.AddRange(userRole.Role.Claims.Select(x => x.ToClaim()));
 
-        var userPermissionSpecification = new SpecificationBuilder<UserPermission>()
-            .HasCriteria(x => x.UserId == user.Id)
-            .HasInclude(x => x.Permission)
-            .HasOrderBy(x => x.Permission.Module)
-            .Build();
-
-        var userPermissions = await _userPermissionRepository.GetAllAsync(
-            userPermissionSpecification,
-            ct
-        );
-
         claims.AddRange(
-            userPermissions.Select(x => new Claim(
-                CustomeClaimTypes.Permissions.ToString(),
-                x.Permission.Value
-            ))
+            user.UserPremissions.OrderBy(x => x.Permission.Value)
+                .Select(x => new Claim(
+                    CustomeClaimTypes.Permissions.ToString(),
+                    x.Permission.Value
+                ))
         );
 
-        return claims;
+        return Task.FromResult(claims.AsEnumerable());
     }
+
     #endregion
 }
