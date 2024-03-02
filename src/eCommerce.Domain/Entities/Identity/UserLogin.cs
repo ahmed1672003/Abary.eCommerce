@@ -21,6 +21,7 @@ public sealed class UserLogin
     #endregion
 
     #region Props
+    public DateTime? EndLogin { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
     public DateTime? UpdatedOn { get; set; }

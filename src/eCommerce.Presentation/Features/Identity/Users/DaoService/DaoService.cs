@@ -33,6 +33,7 @@ public sealed class UserDaoService : IUserDaoService
     readonly DbSet<User> _users;
     readonly DbSet<Notification> _notifications;
     readonly DbSet<UserToken> _userTokens;
+    readonly DbSet<UserLogin> _userLogins;
 
     readonly string _success;
     readonly string _userId;
@@ -56,6 +57,7 @@ public sealed class UserDaoService : IUserDaoService
         _users = _context.Set<User>();
         _notifications = _context.Set<Notification>();
         _userTokens = _context.Set<UserToken>();
+        _userLogins = _context.Set<UserLogin>();
 
         _userId = _httpContextAccessor.HttpContext.User.FindFirstValue(
             nameof(CustomeClaimTypes.UserId)
