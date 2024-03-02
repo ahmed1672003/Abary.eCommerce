@@ -172,23 +172,11 @@ public sealed class UserDaoService : IUserDaoService
             var tokenDto = await _jwtService.GenerateTokenAsync(user, request.LoginProvider, ct);
             var token = _mapper.Map<UserToken>(tokenDto);
 
-            if (user.Token != null && !user.Token.IsRevoked)
-            {
-                tokenDto = _mapper.Map<TokenDto>(user.Token);
-            }
-            else if (user.Token != null && user.Token.IsRevoked)
-            {
+            if (user.Token != null)
                 await _userTokens.Where(x => x.Id == user.Token.Id).ExecuteDeleteAsync(ct);
 
-                modifiedRows++;
-                await _userTokens.AddAsync(token);
-            }
-            else
-            {
-                modifiedRows++;
-                await _userTokens.AddAsync(token);
-            }
-
+            modifiedRows++;
+            await _userTokens.AddAsync(token);
             var success = await _context.IsDoneAsync(modifiedRows, ct);
 
             if (success)
@@ -221,11 +209,12 @@ public sealed class UserDaoService : IUserDaoService
             var modifiedRows = 0;
             var token = await _userTokens.FirstAsync(x => x.UserId == Guid.Parse(_userId));
 
-            modifiedRows++;
-            token.RevokedOn = DateTime.UtcNow;
-            var success = await _context.IsDoneAsync(modifiedRows, ct);
+            modifiedRows = await _userTokens
+                .AsNoTracking()
+                .Where(x => x.UserId == Guid.Parse(_userId))
+                .ExecuteDeleteAsync(ct);
 
-            if (success)
+            if (modifiedRows == 1)
             {
                 await transaction.CommitAsync(ct);
                 return new Response { IsSuccess = true, Message = _success, };

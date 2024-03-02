@@ -6,14 +6,12 @@ using eCommerce.Domain.Abstractions.Repositories;
 using eCommerce.Domain.Enums.User;
 using eCommerce.Persistence.Settings;
 using eCommerce.Presentation.Jwt.Dto;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace eCommerce.Presentation.Jwt.Service;
 
 public sealed class JwtService : IJwtService
 {
-    readonly IOptions<JwtSettings> _options;
     readonly IeCommerceDbContext _context;
     readonly JwtSettings _jwtSettings;
 
@@ -24,23 +22,22 @@ public sealed class JwtService : IJwtService
     readonly DbSet<UserPermission> _userPermissions;
 
     public JwtService(
-        IOptions<JwtSettings> options,
         IRepository<User> userRepository,
         IRepository<UserClaim> userClaimRepository,
         IRepository<Role> roleRepository,
         IRepository<UserRole> userRoleRepository,
         IRepository<UserPermission> userPermissionRepository,
-        IeCommerceDbContext context
+        IeCommerceDbContext context,
+        JwtSettings jwtSettings
     )
     {
-        _options = options;
-        _jwtSettings = options.Value;
         _context = context;
         _users = _context.Set<User>();
         _userClaims = _context.Set<UserClaim>();
         _roles = _context.Set<Role>();
         _userRoles = _context.Set<UserRole>();
         _userPermissions = _context.Set<UserPermission>();
+        _jwtSettings = jwtSettings;
     }
 
     public async Task<TokenDto> GenerateTokenAsync(

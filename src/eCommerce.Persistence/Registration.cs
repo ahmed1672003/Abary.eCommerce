@@ -71,31 +71,22 @@ public static class Registration
             })
             .AddJwtBearer(jwtBearerOptions =>
             {
-                jwtBearerOptions.Authority = config["Authentication:Authority"];
+                var jwtSettings = services
+                    .BuildServiceProvider()
+                    .CreateScope()
+                    .Resolve<JwtSettings>();
+
+                //    jwtBearerOptions.Authority = config["Authentication:Authority"];
                 jwtBearerOptions.TokenValidationParameters.ValidateAudience = false;
                 jwtBearerOptions.TokenValidationParameters.ValidateIssuer = true;
                 jwtBearerOptions.TokenValidationParameters.ValidateIssuerSigningKey = false;
-                jwtBearerOptions.TokenValidationParameters = new()
-                {
-                    ValidateIssuerSigningKey = true,
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero,
-                    ValidIssuer = config.GetValue<string>(
-                        $"{nameof(JwtSettings)}:{nameof(JwtSettings.Issuer)}"
-                    ),
-                    ValidAudience = config.GetValue<string>(
-                        $"{nameof(JwtSettings)}:{nameof(JwtSettings.Audience)}"
-                    ),
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(
-                            config.GetValue<string>(
-                                $"{nameof(JwtSettings)}:{nameof(JwtSettings.Secret)}"
-                            )
-                        )
-                    ),
-                };
+                jwtBearerOptions.TokenValidationParameters.ValidateLifetime =
+                    jwtSettings.ValidateLifeTime;
+                jwtBearerOptions.TokenValidationParameters.ClockSkew = TimeSpan.Zero;
+                jwtBearerOptions.TokenValidationParameters.ValidIssuer = jwtSettings.Issuer;
+                jwtBearerOptions.TokenValidationParameters.ValidAudience = jwtSettings.Audience;
+                jwtBearerOptions.TokenValidationParameters.IssuerSigningKey =
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret));
             });
         services.AddSwaggerGen(options =>
         {
@@ -144,7 +135,6 @@ public static class Registration
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
         services.AddSingleton<JwtSettings>();
-        services.Configure<JwtSettings>(config.GetSection(nameof(JwtSettings)));
         services.AddScoped<TokenMiddleware>();
 
         var servicProvider = services.BuildServiceProvider();

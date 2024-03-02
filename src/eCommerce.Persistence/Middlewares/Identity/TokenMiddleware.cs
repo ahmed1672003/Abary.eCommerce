@@ -18,7 +18,7 @@ public sealed class TokenMiddleware : IMiddleware
                     .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.Value == accessToken);
 
-                if (token != null && token.IsRevoked)
+                if (token == null)
                 {
                     var statusCode = (int)CustomHttpStatusCode.LoginAgain;
                     var response = GetResponse(statusCode);
