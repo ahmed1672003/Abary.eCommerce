@@ -1,10 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using eCommerce.Domain.Abstractions.Contexts;
-using eCommerce.Domain.Entities.Identity;
-using FastEndpoints;
-using Microsoft.EntityFrameworkCore;
-
-namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Create;
+﻿namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Create;
 
 public sealed class CreateUserValidator : Validator<CreateUserRequest>
 {
@@ -13,11 +7,25 @@ public sealed class CreateUserValidator : Validator<CreateUserRequest>
         RuleLevelCascadeMode = CascadeMode.Stop;
         ClassLevelCascadeMode = CascadeMode.Stop;
 
-        RuleFor(x => x.Email).NotEmpty().NotEmpty();
+        RuleFor(x => x.Email)
+            .NotEmpty()
+            .WithMessage("حقل البريد الالكتروني مطلوب")
+            .NotNull()
+            .WithMessage("حقل البريد الالكتروني مطلوب");
 
-        RuleFor(x => x.Password).NotEmpty().NotEmpty();
+        RuleFor(x => x.Email)
+            .NotEmpty()
+            .WithMessage("حقل اسم المستخدم مطلوب")
+            .NotNull()
+            .WithMessage("حقل اسم المستخدم مطلوب");
 
-        RuleFor(x => x.ConfirmPassword).NotEmpty().NotEmpty();
+        RuleFor(x => x.Password)
+            .NotEmpty()
+            .WithMessage("كلمة المرور مطلوبة")
+            .NotNull()
+            .WithMessage("اسم المستخدم مطلوب");
+
+        RuleFor(x => x.ConfirmPassword).NotEmpty().NotNull();
 
         RuleFor(x => x.Password).Matches(x => x.ConfirmPassword);
 
@@ -33,7 +41,7 @@ public sealed class CreateUserValidator : Validator<CreateUserRequest>
                 {
                     var users = Resolve<IeCommerceDbContext>().Set<User>();
 
-                    return !await users.AnyAsync(x => x.Email == req.Email, ct);
+                    return !await users.AnyAsync(x => x.NormalizedEmail == req.Email.ToUpper(), ct);
                 }
             );
 
@@ -43,7 +51,10 @@ public sealed class CreateUserValidator : Validator<CreateUserRequest>
                 {
                     var users = Resolve<IeCommerceDbContext>().Set<User>();
 
-                    return !await users.AnyAsync(x => x.UserName == req.UserName, ct);
+                    return !await users.AnyAsync(
+                        x => x.NormalizedUserName == req.UserName.ToUpper(),
+                        ct
+                    );
                 }
             );
     }

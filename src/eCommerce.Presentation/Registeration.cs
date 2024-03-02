@@ -1,11 +1,10 @@
 ﻿using System.Reflection;
-using eCommerce.Domain.Entities.Identity;
 using eCommerce.Persistence.Middlewares.ExceptionHandling;
+using eCommerce.Presentation.Cache;
 using eCommerce.Presentation.Features.Identity.Users.DaoService;
 using eCommerce.Presentation.Features.Identity.Users.Service;
 using eCommerce.Presentation.Json.Service;
 using eCommerce.Presentation.Jwt.Service;
-using FastEndpoints;
 using Microsoft.AspNetCore.Identity;
 
 namespace eCommerce.Presentation;
@@ -15,7 +14,6 @@ public static class Registeration
     public static IServiceCollection RegisterPresentation(this IServiceCollection services)
     {
         services.AddHttpContextAccessor();
-        services.AddSingleton<ExceptionMiddleware>();
 
         // Mapper
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
@@ -30,7 +28,16 @@ public static class Registeration
             .AddScoped<UserManager<User>>()
             .AddScoped<RoleManager<Role>>()
             .AddScoped<SignInManager<User>>()
+            .AddScoped<ICacheService, CacheService>()
             .AddScoped<IJsonService, JsonService>();
+
+        services.AddSingleton<ExceptionMiddleware>();
+        // Cache
+        services.AddStackExchangeRedisCache(setupAction =>
+        {
+            setupAction.Configuration = "https://localhost:7006/";
+        });
+        services.AddMemoryCache();
 
         // Fastendpoints
         services.AddFastEndpoints();
@@ -52,6 +59,8 @@ public static class Registeration
         });
 
         // Seeding
+
+        // Device Detection
 
         return services;
     }

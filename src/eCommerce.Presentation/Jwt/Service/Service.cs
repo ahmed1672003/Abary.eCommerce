@@ -1,12 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
-using eCommerce.Domain.Abstractions.Contexts;
 using eCommerce.Domain.Abstractions.Repositories;
-using eCommerce.Domain.Entities.Identity;
+using eCommerce.Domain.Enums.User;
 using eCommerce.Persistence.Settings;
 using eCommerce.Presentation.Jwt.Dto;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -44,9 +43,13 @@ public sealed class JwtService : IJwtService
         _userPermissions = _context.Set<UserPermission>();
     }
 
-    public async Task<TokenDto> GenerateTokenAsync(User user, CancellationToken ct)
+    public async Task<TokenDto> GenerateTokenAsync(
+        User user,
+        LoginProvider loginProvider,
+        CancellationToken ct
+    )
     {
-        var expire = DateTime.Now.AddDays(_jwtSettings.AccessTokenExpireDate);
+        var expire = DateTime.Now.AddSeconds(_jwtSettings.AccessTokenExpireDate);
         var symmetricSecurityKey = new SymmetricSecurityKey(
             Encoding.ASCII.GetBytes(_jwtSettings.Secret)
         );
@@ -62,7 +65,16 @@ public sealed class JwtService : IJwtService
         );
         var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
 
-        return new TokenDto { AccessToken = accessToken, Expiration = expire, };
+        return new TokenDto
+        {
+            UserId = user.Id,
+            LoginProvider = loginProvider.ToString(),
+            Name = nameof(AuthenticationTypeName.JWT),
+            Schema = nameof(AuthSchema.Bearer),
+            ExpiresIn = _jwtSettings.AccessTokenExpireDate,
+            Value = accessToken,
+            RefreshToken = GenerateRefreshToken(),
+        };
     }
 
     #region Helpers
@@ -71,16 +83,16 @@ public sealed class JwtService : IJwtService
         var claims = new List<Claim>(0);
 
         if (!string.IsNullOrEmpty(user.Email))
-            claims.Add(new(CustomeClaimTypes.Email.ToString(), user.Email));
+            claims.Add(new(nameof(CustomeClaimTypes.Email), user.Email));
 
         if (!string.IsNullOrEmpty(user.UserName))
-            claims.Add(new(CustomeClaimTypes.UserName.ToString(), user.UserName));
+            claims.Add(new(nameof(CustomeClaimTypes.UserName), user.UserName));
 
         if (!string.IsNullOrEmpty(user.Id.ToString()))
-            claims.Add(new(CustomeClaimTypes.UserId.ToString(), user.Id.ToString()));
+            claims.Add(new(nameof(CustomeClaimTypes.UserId), user.Id.ToString()));
 
         if (!string.IsNullOrEmpty(user.PhoneNumber))
-            claims.Add(new(CustomeClaimTypes.PhoneNumber.ToString(), user.PhoneNumber));
+            claims.Add(new(nameof(CustomeClaimTypes.PhoneNumber), user.PhoneNumber));
 
         claims.AddRange(user.Claims.Select(x => x.ToClaim()));
 
@@ -89,13 +101,18 @@ public sealed class JwtService : IJwtService
 
         claims.AddRange(
             user.UserPremissions.OrderBy(x => x.Permission.Value)
-                .Select(x => new Claim(
-                    CustomeClaimTypes.Permissions.ToString(),
-                    x.Permission.Value
-                ))
+                .Select(x => new Claim(nameof(CustomeClaimTypes.Permissions), x.Permission.Value))
         );
 
         return Task.FromResult(claims.AsEnumerable());
+    }
+
+    private string GenerateRefreshToken()
+    {
+        var randomNumber = new byte[64];
+        var randomNumberGenerate = RandomNumberGenerator.Create();
+        randomNumberGenerate.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
     }
 
     #endregion

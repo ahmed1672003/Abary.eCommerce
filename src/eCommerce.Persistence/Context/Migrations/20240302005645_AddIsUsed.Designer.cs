@@ -13,8 +13,8 @@ using eCommerce.Persistence.Context;
 namespace eCommerce.Persistence.Context.Migrations
 {
     [DbContext(typeof(eCommerceDbContext))]
-    [Migration("20240224220118_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240302005645_AddIsUsed")]
+    partial class AddIsUsed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -448,14 +448,9 @@ namespace eCommerce.Persistence.Context.Migrations
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserToken", b =>
                 {
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
@@ -469,8 +464,32 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<long>("ExpiresIn")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LoginProvider")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RevokedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Schema")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uuid");
@@ -478,12 +497,16 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Value")
                         .HasColumnType("text");
 
-                    b.HasKey("LoginProvider", "UserId", "Name");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("UserToken", "Identity");
                 });
@@ -796,8 +819,8 @@ namespace eCommerce.Persistence.Context.Migrations
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserToken", b =>
                 {
                     b.HasOne("eCommerce.Domain.Entities.Identity.User", "User")
-                        .WithMany("Tokens")
-                        .HasForeignKey("UserId")
+                        .WithOne("Token")
+                        .HasForeignKey("eCommerce.Domain.Entities.Identity.UserToken", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -825,7 +848,8 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Navigation("Profile")
                         .IsRequired();
 
-                    b.Navigation("Tokens");
+                    b.Navigation("Token")
+                        .IsRequired();
 
                     b.Navigation("UserPremissions");
 

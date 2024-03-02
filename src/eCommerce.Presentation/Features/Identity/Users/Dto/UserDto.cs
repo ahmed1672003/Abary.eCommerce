@@ -7,6 +7,21 @@ public sealed record UserDto
     public string Email { get; set; }
     public DateTime CreatedOn { get; set; }
     public UserProfileDto Profile { get; set; }
+    public List<UserPermissionDto> UserPremissions { get; set; } = new(0);
+
+    public class UserPermissionDto
+    {
+        public PermissionDto Permission { get; set; }
+
+        public class PermissionDto
+        {
+            public Guid Id { get; set; }
+            public EntityName Entity { get; set; }
+            public ModuleName Module { get; set; }
+            public string Value { get; set; }
+            public DateTime CreatedOn { get; set; }
+        }
+    }
 
     public sealed record UserProfileDto
     {

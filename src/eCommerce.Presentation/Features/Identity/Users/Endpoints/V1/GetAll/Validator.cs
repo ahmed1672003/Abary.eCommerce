@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.GetAll;
 
-namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.GetAll;
-internal class Validator
+internal sealed class GetAllUsersValidator : Validator<GetAllUsersRequest>
 {
+    public GetAllUsersValidator()
+    {
+        ClassLevelCascadeMode = CascadeMode.Stop;
+        RuleLevelCascadeMode = CascadeMode.Stop;
+    }
 }

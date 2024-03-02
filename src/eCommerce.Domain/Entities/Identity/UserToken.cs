@@ -1,7 +1,9 @@
-﻿namespace eCommerce.Domain.Entities.Identity;
+﻿using eCommerce.Domain.Enums.User;
+
+namespace eCommerce.Domain.Entities.Identity;
 
 [Table(nameof(EntityName.UserToken), Schema = nameof(ModuleName.Identity))]
-[PrimaryKey(nameof(LoginProvider), nameof(UserId), nameof(Name))]
+[PrimaryKey(nameof(Id))]
 public sealed class UserToken
     : IdentityUserToken<Guid>,
         ITrackableCreate<Guid>,
@@ -10,9 +12,16 @@ public sealed class UserToken
         ITrackableUpdate<Guid>
 {
     #region Ctor
+    public UserToken()
+    {
+        Id = Guid.NewGuid();
+    }
     #endregion
 
     #region Keys
+
+    public Guid Id { get; set; }
+
     [ForeignKey(nameof(User))]
     public override Guid UserId { get; set; }
     public Guid CreatedBy { get; set; } = Guid.Empty;
@@ -21,6 +30,13 @@ public sealed class UserToken
     #endregion
 
     #region Props
+    public bool IsUsed { get; set; }
+    public AuthSchema Schema { get; set; }
+    public string RefreshToken { get; set; }
+    public long ExpiresIn { get; set; }
+    public DateTime? RevokedOn { get; set; }
+    public bool IsRevoked =>
+        RevokedOn != null || DateTime.UtcNow.AddSeconds(ExpiresIn * -1) > DateTime.UtcNow;
     public DateTime CreatedOn { get; set; }
     public DateTime? UpdatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }

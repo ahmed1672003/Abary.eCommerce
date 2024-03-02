@@ -403,21 +403,26 @@ namespace eCommerce.Persistence.Context.Migrations
                 schema: "Identity",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "text", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    Schema = table.Column<int>(type: "integer", nullable: false),
+                    RefreshToken = table.Column<string>(type: "text", nullable: false),
+                    ExpiresIn = table.Column<long>(type: "bigint", nullable: false),
+                    RevokedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserToken", x => new { x.LoginProvider, x.UserId, x.Name });
+                    table.PrimaryKey("PK_UserToken", x => x.Id);
                     table.ForeignKey(
                         name: "FK_UserToken_User_UserId",
                         column: x => x.UserId,
@@ -482,7 +487,8 @@ namespace eCommerce.Persistence.Context.Migrations
                 name: "IX_UserToken_UserId",
                 schema: "Identity",
                 table: "UserToken",
-                column: "UserId");
+                column: "UserId",
+                unique: true);
         }
 
         /// <inheritdoc />

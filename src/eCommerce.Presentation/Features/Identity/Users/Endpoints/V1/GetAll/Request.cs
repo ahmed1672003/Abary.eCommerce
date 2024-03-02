@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using eCommerce.Domain.Bases.Request;
+using eCommerce.Domain.Enums.User;
 
 namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.GetAll;
-internal class Request
-{
-}
+
+public sealed record GetAllUsersRequest(UserOrderBy UserOrderBy = UserOrderBy.CreatedOn)
+    : PaginateRequest();

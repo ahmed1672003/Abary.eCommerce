@@ -27,6 +27,10 @@ public sealed class CustomSaveChangesInterceptor : SaveChangesInterceptor
             if (entry is not { State: EntityState.Added, Entity: ITrackableCreate<Guid> entity, })
                 continue;
 
+            if (entity.CreatedBy == Guid.Empty)
+            {
+                entity.CreatedBy = Guid.Parse(SystemConstants.SYSTEM_KEY);
+            }
             await entity.CreateAsync();
         }
 
@@ -34,6 +38,11 @@ public sealed class CustomSaveChangesInterceptor : SaveChangesInterceptor
         {
             if (entry is not { State: EntityState.Modified, Entity: ITrackableUpdate<Guid> entity })
                 continue;
+
+            if (entity == null || entity.UpdatedBy == Guid.Empty)
+            {
+                entity.UpdatedBy = Guid.Parse(SystemConstants.SYSTEM_KEY);
+            }
 
             await entity.UpdateAsync();
         }
@@ -54,6 +63,12 @@ public sealed class CustomSaveChangesInterceptor : SaveChangesInterceptor
                 continue;
 
             entry.State = EntityState.Modified;
+
+            if (entity.DeletedBy == Guid.Empty)
+            {
+                entity.DeletedBy = Guid.Parse(SystemConstants.SYSTEM_KEY);
+            }
+
             await entity.DeleteAsync();
         }
 

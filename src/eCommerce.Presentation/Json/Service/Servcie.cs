@@ -6,6 +6,9 @@ public sealed class JsonService : IJsonService
 {
     public Task<string> SeralizeAsync(object value, CancellationToken ct = default)
     {
+        if (value == null)
+            return Task.FromResult(string.Empty);
+
         var jsonValue = JsonConvert.SerializeObject(
             value,
             new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, }

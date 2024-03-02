@@ -1,4 +1,5 @@
-﻿using eCommerce.Persistence.Seeders;
+﻿using eCommerce.Persistence.Middlewares.Identity;
+using eCommerce.Persistence.Seeders;
 using eCommerce.Persistence.Seeding;
 using eCommerce.Persistence.Settings;
 using FastEndpoints;
@@ -24,6 +25,7 @@ public static class Registration
             {
                 options.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING"));
                 options.AddInterceptors(new CustomSaveChangesInterceptor());
+                options.EnableSensitiveDataLogging();
             },
             ServiceLifetime.Scoped
         );
@@ -143,6 +145,7 @@ public static class Registration
 
         services.AddSingleton<JwtSettings>();
         services.Configure<JwtSettings>(config.GetSection(nameof(JwtSettings)));
+        services.AddScoped<TokenMiddleware>();
 
         var servicProvider = services.BuildServiceProvider();
         using (var scope = servicProvider.CreateScope())

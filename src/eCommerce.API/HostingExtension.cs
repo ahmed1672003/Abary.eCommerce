@@ -1,4 +1,6 @@
-﻿namespace eCommerce.API;
+﻿using eCommerce.Persistence.Middlewares.Identity;
+
+namespace eCommerce.API;
 
 public static class HostingExtension
 {
@@ -27,6 +29,7 @@ public static class HostingExtension
     {
         app.UsePresentation();
         app.ConfigureExceptionHandlingMiddleware();
+        app.UseMiddleware<TokenMiddleware>();
         app.UseAuthentication().UseAuthorization();
         return app;
     }

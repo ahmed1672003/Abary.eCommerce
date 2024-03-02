@@ -1,10 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using eCommerce.Domain.Constants;
+using eCommerce.Presentation.Features.Identity.Users.Service;
 
 namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.GetAll;
-internal class Endpoint
+
+internal class GetAllUsersEndpoint : Endpoint<GetAllUsersRequest, Response>
 {
+    public override void Configure()
+    {
+        Get($"{nameof(ModuleName.Identity)}/{nameof(FeatureName.User)}/{nameof(GetAll)}");
+        Permissions(SystemConstants.Security.Identity.Users.GetAll);
+    }
+
+    public override async Task HandleAsync(GetAllUsersRequest req, CancellationToken ct)
+    {
+        Response = await Resolve<IUserService>().GetAllAsync(req, ct);
+    }
 }

@@ -1,10 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using eCommerce.Presentation.Features.Identity.Users.Service;
 
 namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Register;
-internal class Endpoint
+
+internal sealed class RegisterUserEndpoint : Endpoint<RegisterUserRequest, Response>
 {
+    public override void Configure()
+    {
+        Post($"{ModuleName.Identity}/{EntityName.User}/{nameof(Register)}");
+        AllowAnonymous();
+    }
+
+    public override async Task HandleAsync(RegisterUserRequest req, CancellationToken ct)
+    {
+        Response = await Resolve<IUserService>().RegisterAsync(req, ct);
+    }
 }
