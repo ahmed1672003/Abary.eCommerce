@@ -1,5 +1,4 @@
-﻿using eCommerce.Persistence.Middlewares.Identity;
-using eCommerce.Persistence.Seeders;
+﻿using eCommerce.Persistence.Seeders;
 using eCommerce.Persistence.Seeding;
 using eCommerce.Persistence.Settings;
 using FastEndpoints;
@@ -13,19 +12,23 @@ public static class Registration
         IConfiguration config
     )
     {
-        #region Env Configurations
-        var root = Directory.GetCurrentDirectory();
-        var parentRoot = Directory.GetParent(root);
-        var dotenv = Path.Combine(parentRoot.FullName, ".env");
-        Env.Load(dotenv);
-        #endregion
-
         services.AddDbContext<IeCommerceDbContext, eCommerceDbContext>(
             options =>
             {
-                options.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING"));
+                options.UseNpgsql(
+                    Environment.GetEnvironmentVariable(
+                        nameof(
+                            SystemConstants.Database.Localhost.LOCALHOST_DATABASE_CONNECTION_STRING
+                        )
+                    )
+                //    Environment.GetEnvironmentVariable(
+                //    nameof(
+                //        SystemConstants.Database.Cloud.CLOUD_DATABASE_CONNECTION_STRING
+                //    )
+                //)
+                );
                 options.AddInterceptors(new CustomSaveChangesInterceptor());
-                options.EnableSensitiveDataLogging();
+                //   options.EnableSensitiveDataLogging();
             },
             ServiceLifetime.Scoped
         );
@@ -76,7 +79,6 @@ public static class Registration
                     .CreateScope()
                     .Resolve<JwtSettings>();
 
-                //    jwtBearerOptions.Authority = config["Authentication:Authority"];
                 jwtBearerOptions.TokenValidationParameters.ValidateAudience = false;
                 jwtBearerOptions.TokenValidationParameters.ValidateIssuer = true;
                 jwtBearerOptions.TokenValidationParameters.ValidateIssuerSigningKey = false;
@@ -135,7 +137,6 @@ public static class Registration
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
         services.AddSingleton<JwtSettings>();
-        services.AddScoped<TokenMiddleware>();
 
         var servicProvider = services.BuildServiceProvider();
         using (var scope = servicProvider.CreateScope())
@@ -145,14 +146,17 @@ public static class Registration
                 var userManager = scope.Resolve<UserManager<User>>();
                 var permissions = context.Set<Permission>();
 
-                if (!await permissions.AnyAsync())
+                if (!await context.EnsureCreatedAsync())
                 {
-                    await PermissionSeeder.SeedPermissionsAsync(context);
-                }
+                    if (!await permissions.AnyAsync())
+                    {
+                        await PermissionSeeder.SeedPermissionsAsync(context);
+                    }
 
-                if (!await userManager.Users.AnyAsync())
-                {
-                    await UserSeeder.SeedAsync(context, userManager);
+                    if (!await userManager.Users.AnyAsync())
+                    {
+                        await UserSeeder.SeedAsync(context, userManager);
+                    }
                 }
             }
         }

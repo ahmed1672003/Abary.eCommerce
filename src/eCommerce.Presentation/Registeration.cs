@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using eCommerce.Persistence.Middlewares.ExceptionHandling;
-using eCommerce.Presentation.Cache;
+using eCommerce.Persistence.Middlewares.Identity;
 using eCommerce.Presentation.Features.Identity.Users.DaoService;
 using eCommerce.Presentation.Features.Identity.Users.Service;
 using eCommerce.Presentation.Json.Service;
@@ -28,16 +28,10 @@ public static class Registeration
             .AddScoped<UserManager<User>>()
             .AddScoped<RoleManager<Role>>()
             .AddScoped<SignInManager<User>>()
-            .AddScoped<ICacheService, CacheService>()
             .AddScoped<IJsonService, JsonService>();
 
-        services.AddSingleton<ExceptionMiddleware>();
-        // Cache
-        services.AddStackExchangeRedisCache(setupAction =>
-        {
-            setupAction.Configuration = "https://localhost:7006/";
-        });
-        services.AddMemoryCache();
+        services.AddScoped<ExceptionMiddleware>();
+        services.AddScoped<TokenMiddleware>();
 
         // Fastendpoints
         services.AddFastEndpoints();
@@ -60,7 +54,6 @@ public static class Registeration
 
         // Seeding
 
-        // Device Detection
 
         return services;
     }

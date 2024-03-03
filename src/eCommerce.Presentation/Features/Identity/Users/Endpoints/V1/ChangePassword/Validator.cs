@@ -1,0 +1,58 @@
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+
+namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.ChangePassword;
+
+public sealed class ChangePasswordValidator : Validator<ChangePasswordRequest>
+{
+    public ChangePasswordValidator()
+    {
+        ClassLevelCascadeMode = CascadeMode.Stop;
+        RuleLevelCascadeMode = CascadeMode.Stop;
+
+        RuleFor(x => x.OldPassword)
+            .NotNull()
+            .WithMessage("حقل كلمة المرور القديمة مطلوب")
+            .NotEmpty()
+            .WithMessage("حقل كلمة المرور القديمة مطلوب");
+
+        RuleFor(x => x.NewPassword)
+            .NotNull()
+            .WithMessage("حقل كلمة المرور الجديدة مطلوب")
+            .NotEmpty()
+            .WithMessage("حقل كلمة المرور الجديدة مطلوب");
+
+        RuleFor(x => x.ConfirmNewPassword)
+            .NotNull()
+            .WithMessage("حقل تأكيد كلمة المرور الجديدة مطلوب")
+            .NotEmpty()
+            .WithMessage("حقل تأكيد كلمة المرور الجديدة مطلوب");
+
+        RuleFor(x => x.OldPassword)
+            .NotEqual(x => x.NewPassword)
+            .WithMessage("لايمكن التغيير بكلمة المرور القديمة");
+
+        RuleFor(x => x.NewPassword)
+            .Matches(x => x.ConfirmNewPassword)
+            .WithMessage("كلمتا المرور غير متطابقتان");
+
+        RuleFor(x => x)
+            .MustAsync(
+                async (req, ct) =>
+                {
+                    var userId = Resolve<IHttpContextAccessor>()
+                        .HttpContext.User.FindFirstValue(nameof(CustomeClaimTypes.UserId));
+
+                    var userManager = Resolve<UserManager<User>>();
+
+                    var user = await userManager
+                        .Users.AsNoTracking()
+                        .FirstOrDefaultAsync(x => x.Id == Guid.Parse(userId));
+
+                    return await userManager.CheckPasswordAsync(user, req.OldPassword);
+                }
+            )
+            .WithMessage("كلمة المرور خاطئة");
+    }
+}

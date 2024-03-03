@@ -30,7 +30,6 @@ public sealed class UserToken
     #endregion
 
     #region Props
-    public bool IsUsed { get; set; }
     public AuthSchema Schema { get; set; }
     public string RefreshToken { get; set; }
     public long ExpiresIn { get; set; }

@@ -1,4 +1,5 @@
-﻿using eCommerce.Persistence.Middlewares.Identity;
+﻿using eCommerce.Domain.Constants;
+using eCommerce.Persistence.Middlewares.Identity;
 
 namespace eCommerce.API;
 
@@ -9,8 +10,20 @@ public static class HostingExtension
         WebApplicationBuilder builder
     )
     {
+        SystemConstants.SetEnvironmentVariables();
         service.AddHttpContextAccessor();
         service.AddAuthentication();
+        service.AddCors(options =>
+        {
+            options.AddPolicy(
+                "All",
+                policy =>
+                {
+                    policy.AllowAnyMethod().AllowAnyOrigin().AllowAnyHeader();
+                }
+            );
+        });
+
         service
             .RegisterDomain()
             .RegisterPresentation()
@@ -27,6 +40,7 @@ public static class HostingExtension
 
     public static WebApplication HostServices(this WebApplication app)
     {
+        app.UseCors("All");
         app.UsePresentation();
         app.ConfigureExceptionHandlingMiddleware();
         app.UseMiddleware<TokenMiddleware>();

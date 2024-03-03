@@ -7,10 +7,11 @@ using eCommerce.Domain.Exceptions;
 using eCommerce.Persistence.Builders;
 using eCommerce.Presentation.Extensions;
 using eCommerce.Presentation.Features.Identity.Users.Dto;
+using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Authenticate;
+using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.ChangePassword;
 using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Create;
 using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Get;
 using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.GetAll;
-using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Login;
 using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Register;
 using eCommerce.Presentation.Json.Service;
 using eCommerce.Presentation.Jwt.Dto;
@@ -145,65 +146,27 @@ public sealed class UserDaoService : IUserDaoService
         }
     }
 
-    public async Task<Response> LoginAsync(LoginUserRequest request, CancellationToken ct)
+    public async Task<Response> AuthenticateAsync(
+        AuthenticateUserRequest request,
+        CancellationToken ct
+    )
     {
-        var transaction = await _context.BeginTransactionAsync(ct);
-        try
+        var tokenDto =
+            request.RefreshToken != null
+                ? await RefreshTokenAsync(request, ct)
+                : await LoginAsync(request, ct);
+
+        return new Response<TokenDto>
         {
-            var modifiedRows = 0;
-
-            var user = await _users
-                .AsNoTracking()
-                .Include(x => x.Claims)
-                .Include(x => x.UserRoles)
-                .ThenInclude(x => x.Role)
-                .ThenInclude(x => x.Claims)
-                .Include(x => x.UserPremissions)
-                .ThenInclude(x => x.Permission)
-                .Include(x => x.Token)
-                .FirstAsync(
-                    x =>
-                        new EmailAddressAttribute().IsValid(request.EmailOrUserName)
-                            ? x.NormalizedEmail == request.EmailOrUserName.ToUpper()
-                            : x.NormalizedUserName == request.EmailOrUserName.ToUpper(),
-                    ct
-                );
-
-            var tokenDto = await _jwtService.GenerateTokenAsync(user, request.LoginProvider, ct);
-            var token = _mapper.Map<UserToken>(tokenDto);
-
-            if (user.Token != null)
-                await _userTokens.Where(x => x.Id == user.Token.Id).ExecuteDeleteAsync(ct);
-
-            modifiedRows++;
-            await _userTokens.AddAsync(token);
-            var success = await _context.IsDoneAsync(modifiedRows, ct);
-
-            if (success)
-            {
-                await transaction.CommitAsync(ct);
-
-                return new Response<TokenDto>()
-                {
-                    IsSuccess = true,
-                    Message = _success,
-                    Result = tokenDto,
-                };
-            }
-
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
-        }
+            IsSuccess = true,
+            Message = _success,
+            Result = tokenDto,
+        };
     }
 
     public async Task<Response> LogoutAsync(CancellationToken ct)
     {
-        var transaction = await _context.BeginTransactionAsync(ct);
+        using var transaction = await _context.BeginTransactionAsync(ct);
         try
         {
             var modifiedRows = 0;
@@ -228,9 +191,57 @@ public sealed class UserDaoService : IUserDaoService
         }
     }
 
+    public async Task<Response> ChangePasswordAsync(
+        ChangePasswordRequest request,
+        CancellationToken ct
+    )
+    {
+        using var transaction = await _context.BeginTransactionAsync(ct);
+        try
+        {
+            var modifiedRows = 0;
+
+            var user = await _users
+                .AsNoTracking()
+                .Include(x => x.Token)
+                .FirstAsync(x => x.Id == Guid.Parse(_userId));
+
+            var tokenDto = await _jwtService.GenerateTokenAsync(user, LoginProvider.System, ct);
+
+            var token = _mapper.Map<UserToken>(tokenDto);
+
+            if (user.Token != null)
+                modifiedRows += await _userTokens
+                    .AsNoTracking()
+                    .Where(x => x.UserId == user.Id)
+                    .ExecuteDeleteAsync(ct);
+
+            var result = await _userManager.ChangePasswordAsync(
+                user,
+                request.OldPassword,
+                request.NewPassword
+            );
+
+            if (modifiedRows == 1 && result.Succeeded)
+            {
+                await transaction.CommitAsync(ct);
+
+                return new Response { IsSuccess = true, Message = _success, };
+            }
+
+            await transaction.RollbackAsync(ct);
+            throw new DatabaseTransactionException();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync(ct);
+            throw new DatabaseTransactionException(ex.Message, ex);
+        }
+    }
+
     public async Task<Response> CreatAsync(CreateUserRequest request, CancellationToken ct)
     {
-        var transaction = await _context.BeginTransactionAsync(ct);
+        using var transaction = await _context.BeginTransactionAsync(ct);
         try
         {
             var modifiedRows = 0;
@@ -345,4 +356,121 @@ public sealed class UserDaoService : IUserDaoService
             throw new DatabaseExecuteQueryException(ex.Message, ex.InnerException);
         }
     }
+
+    #region Helpers
+
+    async Task<TokenDto> LoginAsync(AuthenticateUserRequest request, CancellationToken ct)
+    {
+        using var transaction = await _context.BeginTransactionAsync(ct);
+        try
+        {
+            var modifiedRows = 0;
+
+            var user = await _users
+                .AsNoTracking()
+                .Include(x => x.Claims)
+                .Include(x => x.UserRoles)
+                .ThenInclude(x => x.Role)
+                .ThenInclude(x => x.Claims)
+                .Include(x => x.UserPremissions)
+                .ThenInclude(x => x.Permission)
+                .Include(x => x.Token)
+                .FirstAsync(
+                    x =>
+                        new EmailAddressAttribute().IsValid(request.EmailOrUserName)
+                            ? x.NormalizedEmail == request.EmailOrUserName.ToUpper()
+                            : x.NormalizedUserName == request.EmailOrUserName.ToUpper(),
+                    ct
+                );
+
+            var tokenDto = await _jwtService.GenerateTokenAsync(
+                user,
+                request.LoginProvider.Value,
+                ct
+            );
+            var token = _mapper.Map<UserToken>(tokenDto);
+
+            if (user.Token != null)
+                await _userTokens.Where(x => x.Id == user.Token.Id).ExecuteDeleteAsync(ct);
+
+            modifiedRows++;
+            await _userTokens.AddAsync(token);
+
+            modifiedRows++;
+            await _userLogins.AddAsync(new UserLogin() { UserId = user.Id }, ct);
+
+            var success = await _context.IsDoneAsync(modifiedRows, ct);
+
+            if (success)
+            {
+                await transaction.CommitAsync(ct);
+
+                return tokenDto;
+            }
+
+            await transaction.RollbackAsync(ct);
+            throw new DatabaseTransactionException();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync(ct);
+            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+        }
+    }
+
+    async Task<TokenDto> RefreshTokenAsync(AuthenticateUserRequest request, CancellationToken ct)
+    {
+        using var transaction = await _context.BeginTransactionAsync(ct);
+        try
+        {
+            var modifiedRows = 0;
+
+            var user = await _users
+                .AsNoTracking()
+                .Include(x => x.Claims)
+                .Include(x => x.UserRoles)
+                .ThenInclude(x => x.Role)
+                .ThenInclude(x => x.Claims)
+                .Include(x => x.UserPremissions)
+                .ThenInclude(x => x.Permission)
+                .Include(x => x.Token)
+                .FirstAsync(x => x.Token.RefreshToken == request.RefreshToken, ct);
+
+            var tokenDto = await _jwtService.GenerateTokenAsync(
+                user,
+                request.LoginProvider.Value,
+                ct
+            );
+            var token = _mapper.Map<UserToken>(tokenDto);
+
+            modifiedRows += await _userTokens
+                .AsNoTracking()
+                .Where(x => x.UserId == user.Id && x.RefreshToken == request.RefreshToken)
+                .ExecuteDeleteAsync(ct);
+
+            modifiedRows++;
+            await _userTokens.AddAsync(token);
+
+            modifiedRows++;
+            await _userLogins.AddAsync(new UserLogin() { UserId = user.Id }, ct);
+
+            var success = await _context.IsDoneAsync(modifiedRows, ct);
+
+            if (success)
+            {
+                await transaction.CommitAsync(ct);
+
+                return tokenDto;
+            }
+
+            await transaction.RollbackAsync(ct);
+            throw new DatabaseTransactionException();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync(ct);
+            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+        }
+    }
+    #endregion
 }

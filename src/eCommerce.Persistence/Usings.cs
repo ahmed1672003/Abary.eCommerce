@@ -1,7 +1,5 @@
 ﻿global using System.Linq.Expressions;
 global using System.Text;
-global using System.Text.Json;
-global using DotNetEnv;
 global using eCommerce.Domain.Abstractions.Common;
 global using eCommerce.Domain.Abstractions.Contexts;
 global using eCommerce.Domain.Abstractions.Repositories;
@@ -12,7 +10,6 @@ global using eCommerce.Domain.Entities.Identity;
 global using eCommerce.Domain.Entities.Shared;
 global using eCommerce.Domain.Enums;
 global using eCommerce.Domain.Exceptions;
-global using eCommerce.Persistence.Builders;
 global using eCommerce.Persistence.Context;
 global using eCommerce.Persistence.Interceptors;
 global using eCommerce.Persistence.Repositories;

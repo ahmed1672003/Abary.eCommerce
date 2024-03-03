@@ -107,9 +107,9 @@ public sealed class JwtService : IJwtService
     private string GenerateRefreshToken()
     {
         var randomNumber = new byte[64];
-        var randomNumberGenerate = RandomNumberGenerator.Create();
+        using var randomNumberGenerate = RandomNumberGenerator.Create();
         randomNumberGenerate.GetBytes(randomNumber);
-        return Convert.ToBase64String(randomNumber);
+        return string.Concat(Convert.ToBase64String(randomNumber), Guid.NewGuid().ToString());
     }
 
     #endregion

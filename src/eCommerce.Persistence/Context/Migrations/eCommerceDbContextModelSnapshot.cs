@@ -470,9 +470,6 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("LoginProvider")
                         .IsRequired()
                         .HasColumnType("text");
