@@ -413,6 +413,7 @@ namespace eCommerce.Persistence.Context.Migrations
                     RefreshToken = table.Column<string>(type: "text", nullable: false),
                     ExpiresIn = table.Column<long>(type: "bigint", nullable: false),
                     RevokedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsRevoked = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),

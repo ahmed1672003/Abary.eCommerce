@@ -9,7 +9,6 @@ public sealed class LoginUserValidator : Validator<AuthenticateUserRequest>
     {
         ClassLevelCascadeMode = CascadeMode.Stop;
         RuleLevelCascadeMode = CascadeMode.Stop;
-
         RuleFor(x => x.EmailOrUserName)
             .NotEmpty()
             .WithMessage("الحقل مطلوب")
@@ -30,7 +29,13 @@ public sealed class LoginUserValidator : Validator<AuthenticateUserRequest>
             .When(x => x.RefreshToken == null && x.LoginProvider.HasValue);
 
         RuleFor(x => x)
-            .Must(req => !(IsRefreshTokenRequestValid(req) && IsLoginRequestValid(req)))
+            .Must(req => (IsRefreshTokenRequestValid(req)))
+            .When(req => !IsLoginRequestValid(req))
+            .WithMessage("عيب اللي بتعمله دا ينقاش");
+
+        RuleFor(x => x)
+            .Must(req => (IsLoginRequestValid(req)))
+            .When(req => !IsRefreshTokenRequestValid(req))
             .WithMessage("عيب اللي بتعمله دا ينقاش");
 
         RuleFor(x => x)
@@ -40,10 +45,7 @@ public sealed class LoginUserValidator : Validator<AuthenticateUserRequest>
                     return await Resolve<IeCommerceDbContext>()
                         .Set<UserToken>()
                         .AsNoTracking()
-                        .Include(x => x.User)
-                        .AnyAsync(x =>
-                            x.RefreshToken == req.RefreshToken && x.User != null && x.IsRevoked
-                        );
+                        .AnyAsync(x => x.RefreshToken == req.RefreshToken && x.IsRevoked);
                 }
             )
             .WithMessage("من فضلك أعد تسجيل الدخول")

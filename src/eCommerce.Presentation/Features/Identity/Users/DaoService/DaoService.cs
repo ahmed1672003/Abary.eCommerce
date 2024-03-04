@@ -397,7 +397,15 @@ public sealed class UserDaoService : IUserDaoService
             await _userTokens.AddAsync(token);
 
             modifiedRows++;
-            await _userLogins.AddAsync(new UserLogin() { UserId = user.Id }, ct);
+            await _userLogins.AddAsync(
+                new UserLogin()
+                {
+                    UserId = user.Id,
+                    LoginProvider = request.LoginProvider.Value.ToString(),
+                    ProviderKey = request.LoginProvider.Value.ToString(),
+                },
+                ct
+            );
 
             var success = await _context.IsDoneAsync(modifiedRows, ct);
 

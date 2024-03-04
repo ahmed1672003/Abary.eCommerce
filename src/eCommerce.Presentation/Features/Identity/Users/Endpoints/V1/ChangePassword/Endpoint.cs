@@ -2,7 +2,7 @@
 
 namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.ChangePassword;
 
-public sealed class ChangePasswordEndpoint : Endpoint<ChangePasswordRequest, Response>
+public class ChangePasswordEndpoint : Endpoint<ChangePasswordRequest, Response>
 {
     public override void Configure()
     {

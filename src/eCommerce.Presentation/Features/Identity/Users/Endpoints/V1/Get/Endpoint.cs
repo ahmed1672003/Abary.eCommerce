@@ -1,10 +1,9 @@
 ﻿using eCommerce.Domain.Constants;
 using eCommerce.Presentation.Features.Identity.Users.Service;
-using FastEndpoints;
 
 namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Get;
 
-internal sealed class GetUserEndpoint : Endpoint<GetUserRequest, Response>
+public class GetUserEndpoint : Endpoint<GetUserRequest, Response>
 {
     public override void Configure()
     {

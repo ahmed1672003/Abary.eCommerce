@@ -19,7 +19,7 @@ public sealed class UserService : IUserService
     public Task<Response> RegisterAsync(RegisterUserRequest request, CancellationToken ct) =>
         _userDaoService.RegisterAsync(request, ct);
 
-    public Task<Response> LoginAsync(AuthenticateUserRequest reqest, CancellationToken ct) =>
+    public Task<Response> AuthenticateAsync(AuthenticateUserRequest reqest, CancellationToken ct) =>
         _userDaoService.AuthenticateAsync(reqest, ct);
 
     public Task<Response> LogoutAsync(CancellationToken ct) => _userDaoService.LogoutAsync(ct);

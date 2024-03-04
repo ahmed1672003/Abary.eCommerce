@@ -2,5 +2,4 @@
 global using eCommerce.API;
 global using eCommerce.Domain;
 global using eCommerce.Persistence;
-global using eCommerce.Persistence.Middlewares.ExceptionHandling;
 global using eCommerce.Presentation;

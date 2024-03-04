@@ -2,7 +2,7 @@
 
 namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Register;
 
-internal sealed class RegisterUserEndpoint : Endpoint<RegisterUserRequest, Response>
+public class RegisterUserEndpoint : Endpoint<RegisterUserRequest, Response>
 {
     public override void Configure()
     {

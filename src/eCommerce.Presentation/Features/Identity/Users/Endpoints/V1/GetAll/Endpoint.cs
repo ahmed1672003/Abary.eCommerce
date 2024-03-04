@@ -3,7 +3,7 @@ using eCommerce.Presentation.Features.Identity.Users.Service;
 
 namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.GetAll;
 
-internal class GetAllUsersEndpoint : Endpoint<GetAllUsersRequest, Response>
+public class GetAllUsersEndpoint : Endpoint<GetAllUsersRequest, Response>
 {
     public override void Configure()
     {

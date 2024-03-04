@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
-using eCommerce.Persistence.Middlewares.ExceptionHandling;
-using eCommerce.Persistence.Middlewares.Identity;
+using eCommerce.Persistence.Middlewares;
 using eCommerce.Presentation.Features.Identity.Users.DaoService;
 using eCommerce.Presentation.Features.Identity.Users.Service;
 using eCommerce.Presentation.Json.Service;
@@ -14,9 +13,10 @@ public static class Registeration
     public static IServiceCollection RegisterPresentation(this IServiceCollection services)
     {
         services.AddHttpContextAccessor();
-
         // Mapper
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+        // Fluent Validation
 
         // DaoService
         services.AddScoped<IUserDaoService, UserDaoService>();
@@ -30,8 +30,8 @@ public static class Registeration
             .AddScoped<SignInManager<User>>()
             .AddScoped<IJsonService, JsonService>();
 
-        services.AddScoped<ExceptionMiddleware>();
         services.AddScoped<TokenMiddleware>();
+        services.AddScoped<ExceptionMiddleware>();
 
         // Fastendpoints
         services.AddFastEndpoints();
@@ -52,9 +52,6 @@ public static class Registeration
             o.AutoTagPathSegmentIndex = 2;
         });
 
-        // Seeding
-
-
         return services;
     }
 
@@ -65,13 +62,9 @@ public static class Registeration
             c.Versioning.Prefix = "V";
             c.Versioning.PrependToRoute = true;
             c.Endpoints.RoutePrefix = "API/eCommerce";
-            c.Serializer.Options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             c.Endpoints.ShortNames = true;
-            //c.Endpoints.Configurator = ep =>
-            //{
-            //    ep.PostProcessors(Order.After, new ErrorLoggerProcessor());
-            //    ep.PreProcessors(Order.Before, new LocalizationProcessor());
-            //};
+            //  c.Serializer.Options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            //  c.Serializer.Options.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             c.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
             {
                 var errorMsg = failures
@@ -86,7 +79,7 @@ public static class Registeration
                 {
                     IsSuccess = false,
                     StatusCode = statusCode,
-                    Message = $"{errorMsg.Value}"
+                    Message = errorMsg.Value,
                 };
             };
         });

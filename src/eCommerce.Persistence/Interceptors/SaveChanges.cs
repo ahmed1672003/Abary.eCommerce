@@ -24,6 +24,24 @@ public sealed class CustomSaveChangesInterceptor : SaveChangesInterceptor
 
         foreach (var entry in eventData.Context.ChangeTracker.Entries())
         {
+            if (entry is not { State: EntityState.Modified, Entity: UserToken entity })
+                continue;
+
+            if (
+                entity.RevokedOn != null
+                || entity.CreatedOn.AddSeconds(entity.ExpiresIn) >= DateTime.UtcNow
+            )
+            {
+                entity.IsRevoked = true;
+            }
+            else
+            {
+                entity.IsRevoked = false;
+            }
+        }
+
+        foreach (var entry in eventData.Context.ChangeTracker.Entries())
+        {
             if (entry is not { State: EntityState.Added, Entity: ITrackableCreate<Guid> entity, })
                 continue;
 
@@ -32,6 +50,24 @@ public sealed class CustomSaveChangesInterceptor : SaveChangesInterceptor
                 entity.CreatedBy = Guid.Parse(SystemConstants.SYSTEM_KEY);
             }
             await entity.CreateAsync();
+        }
+
+        foreach (var entry in eventData.Context.ChangeTracker.Entries())
+        {
+            if (entry is not { State: EntityState.Added, Entity: UserToken entity })
+                continue;
+
+            if (
+                entity.RevokedOn != null
+                || entity.CreatedOn.AddSeconds(entity.ExpiresIn) >= DateTime.UtcNow
+            )
+            {
+                entity.IsRevoked = true;
+            }
+            else
+            {
+                entity.IsRevoked = false;
+            }
         }
 
         foreach (var entry in eventData.Context.ChangeTracker.Entries())

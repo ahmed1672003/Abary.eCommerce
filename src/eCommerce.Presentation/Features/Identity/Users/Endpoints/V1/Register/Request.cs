@@ -1,6 +1,6 @@
 ﻿namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Register;
 
-public sealed record RegisterUserRequest
+public record RegisterUserRequest
 {
     public string UserName { get; set; }
     public string Email { get; set; }

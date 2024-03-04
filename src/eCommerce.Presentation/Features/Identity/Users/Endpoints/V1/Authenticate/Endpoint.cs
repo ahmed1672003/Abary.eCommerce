@@ -2,7 +2,7 @@
 
 namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Authenticate;
 
-public sealed class LoginUserEndpoint : Endpoint<AuthenticateUserRequest, Response>
+public class LoginUserEndpoint : Endpoint<AuthenticateUserRequest, Response>
 {
     public override void Configure()
     {
@@ -12,6 +12,6 @@ public sealed class LoginUserEndpoint : Endpoint<AuthenticateUserRequest, Respon
 
     public override async Task HandleAsync(AuthenticateUserRequest req, CancellationToken ct)
     {
-        Response = await Resolve<IUserService>().LoginAsync(req, ct);
+        Response = await Resolve<IUserService>().AuthenticateAsync(req, ct);
     }
 }

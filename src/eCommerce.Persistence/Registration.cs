@@ -46,11 +46,11 @@ public static class Registration
                 #endregion
 
                 #region Password Options
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireDigit = false;
-                options.Password.RequiredLength = 3;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 6;
                 #endregion
 
                 #region User Options
@@ -78,17 +78,19 @@ public static class Registration
                     .BuildServiceProvider()
                     .CreateScope()
                     .Resolve<JwtSettings>();
-
-                jwtBearerOptions.TokenValidationParameters.ValidateAudience = false;
-                jwtBearerOptions.TokenValidationParameters.ValidateIssuer = true;
-                jwtBearerOptions.TokenValidationParameters.ValidateIssuerSigningKey = false;
-                jwtBearerOptions.TokenValidationParameters.ValidateLifetime =
-                    jwtSettings.ValidateLifeTime;
-                jwtBearerOptions.TokenValidationParameters.ClockSkew = TimeSpan.Zero;
-                jwtBearerOptions.TokenValidationParameters.ValidIssuer = jwtSettings.Issuer;
-                jwtBearerOptions.TokenValidationParameters.ValidAudience = jwtSettings.Audience;
-                jwtBearerOptions.TokenValidationParameters.IssuerSigningKey =
-                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret));
+                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = jwtSettings.ValidateAudience,
+                    ValidateIssuer = jwtSettings.ValidateAudience,
+                    ValidateIssuerSigningKey = jwtSettings.ValidateIssuerSigningKey,
+                    ValidateLifetime = jwtSettings.ValidateLifeTime,
+                    ClockSkew = TimeSpan.Zero,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtSettings.Secret)
+                    )
+                };
             });
         services.AddSwaggerGen(options =>
         {

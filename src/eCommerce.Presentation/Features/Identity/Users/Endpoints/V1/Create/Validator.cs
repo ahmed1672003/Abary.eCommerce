@@ -1,6 +1,6 @@
 ﻿namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Create;
 
-public sealed class CreateUserValidator : Validator<CreateUserRequest>
+public class CreateUserValidator : Validator<CreateUserRequest>
 {
     public CreateUserValidator()
     {

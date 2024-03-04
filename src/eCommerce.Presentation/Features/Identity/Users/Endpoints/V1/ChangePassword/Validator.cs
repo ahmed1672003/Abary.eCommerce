@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.ChangePassword;
 
-public sealed class ChangePasswordValidator : Validator<ChangePasswordRequest>
+public class ChangePasswordValidator : Validator<ChangePasswordRequest>
 {
     public ChangePasswordValidator()
     {

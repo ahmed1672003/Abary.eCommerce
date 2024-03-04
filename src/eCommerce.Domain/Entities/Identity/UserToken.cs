@@ -34,8 +34,7 @@ public sealed class UserToken
     public string RefreshToken { get; set; }
     public long ExpiresIn { get; set; }
     public DateTime? RevokedOn { get; set; }
-    public bool IsRevoked =>
-        RevokedOn != null || DateTime.UtcNow.AddSeconds(ExpiresIn * -1) > DateTime.UtcNow;
+    public bool IsRevoked { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime? UpdatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }

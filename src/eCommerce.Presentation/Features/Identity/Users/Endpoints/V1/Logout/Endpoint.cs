@@ -2,7 +2,7 @@
 
 namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Logout;
 
-internal sealed class LogoutUserEndpoint : EndpointWithoutRequest<Response>
+public class LogoutUserEndpoint : EndpointWithoutRequest<Response>
 {
     public override void Configure()
     {

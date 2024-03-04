@@ -1,7 +1,7 @@
 ﻿using FastEndpoints;
 using Microsoft.AspNetCore.Authentication;
 
-namespace eCommerce.Persistence.Middlewares.Identity;
+namespace eCommerce.Persistence.Middlewares;
 
 public sealed class TokenMiddleware : IMiddleware
 {
@@ -23,6 +23,7 @@ public sealed class TokenMiddleware : IMiddleware
                     var statusCode = (int)CustomHttpStatusCode.LoginAgain;
                     var response = GetResponse(statusCode);
                     context.Response.StatusCode = statusCode;
+                    context.Response.ContentType = "application/json";
                     await context.Response.WriteAsJsonAsync(response);
                     context.MarkResponseStart();
                 }

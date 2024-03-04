@@ -1,4 +1,4 @@
-﻿namespace eCommerce.Persistence.Middlewares.ExceptionHandling;
+﻿namespace eCommerce.Persistence.Middlewares;
 
 public sealed class ExceptionMiddleware : IMiddleware
 {

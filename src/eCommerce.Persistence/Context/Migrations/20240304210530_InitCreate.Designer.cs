@@ -13,7 +13,7 @@ using eCommerce.Persistence.Context;
 namespace eCommerce.Persistence.Context.Migrations
 {
     [DbContext(typeof(eCommerceDbContext))]
-    [Migration("20240302190327_InitCreate")]
+    [Migration("20240304210530_InitCreate")]
     partial class InitCreate
     {
         /// <inheritdoc />
@@ -471,6 +471,9 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsRevoked")
                         .HasColumnType("boolean");
 
                     b.Property<string>("LoginProvider")
