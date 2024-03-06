@@ -46,7 +46,7 @@ public static class Registration
                 #endregion
 
                 #region Password Options
-                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireLowercase = true;
                 options.Password.RequireUppercase = true;
                 options.Password.RequireDigit = true;

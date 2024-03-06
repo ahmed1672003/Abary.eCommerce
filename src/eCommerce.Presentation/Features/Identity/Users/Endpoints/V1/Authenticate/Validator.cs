@@ -9,24 +9,6 @@ public sealed class LoginUserValidator : Validator<AuthenticateUserRequest>
     {
         ClassLevelCascadeMode = CascadeMode.Stop;
         RuleLevelCascadeMode = CascadeMode.Stop;
-        RuleFor(x => x.EmailOrUserName)
-            .NotEmpty()
-            .WithMessage("الحقل مطلوب")
-            .NotNull()
-            .WithMessage("الحقل مطلوب")
-            .When(x => x.RefreshToken == null && x.EmailOrUserName != null);
-
-        RuleFor(x => x.Pssword)
-            .NotEmpty()
-            .WithMessage("الحقل مطلوب")
-            .NotNull()
-            .WithMessage("الحقل مطلوب")
-            .When(x => x.RefreshToken == null && x.Pssword != null);
-
-        RuleFor(x => x.LoginProvider)
-            .IsInEnum()
-            .WithMessage("نوع خدمة تسجيل الدخول غير صالحة")
-            .When(x => x.RefreshToken == null && x.LoginProvider.HasValue);
 
         RuleFor(x => x)
             .Must(req => (IsRefreshTokenRequestValid(req)))
@@ -37,6 +19,25 @@ public sealed class LoginUserValidator : Validator<AuthenticateUserRequest>
             .Must(req => (IsLoginRequestValid(req)))
             .When(req => !IsRefreshTokenRequestValid(req))
             .WithMessage("عيب اللي بتعمله دا ينقاش");
+
+        RuleFor(x => x.EmailOrUserName)
+            .NotEmpty()
+            .WithMessage("الحقل مطلوب")
+            .NotNull()
+            .WithMessage("الحقل مطلوب")
+            .When(x => x.RefreshToken == null && x.EmailOrUserName != null);
+
+        RuleFor(x => x.Password)
+            .NotEmpty()
+            .WithMessage("الحقل مطلوب")
+            .NotNull()
+            .WithMessage("الحقل مطلوب")
+            .When(x => x.RefreshToken == null && x.Password != null);
+
+        RuleFor(x => x.LoginProvider)
+            .IsInEnum()
+            .WithMessage("نوع خدمة تسجيل الدخول غير صالحة")
+            .When(x => x.RefreshToken == null && x.LoginProvider.HasValue);
 
         RuleFor(x => x)
             .MustAsync(
@@ -67,7 +68,7 @@ public sealed class LoginUserValidator : Validator<AuthenticateUserRequest>
                             x.NormalizedUserName == emailOrUserName
                         );
 
-                    return user != null && await userManager.CheckPasswordAsync(user, req.Pssword);
+                    return user != null && await userManager.CheckPasswordAsync(user, req.Password);
                 }
             )
             .WithMessage("البيانات غير صحيحة")
@@ -77,7 +78,7 @@ public sealed class LoginUserValidator : Validator<AuthenticateUserRequest>
     bool IsLoginRequestValid(AuthenticateUserRequest request) =>
         request.RefreshToken == null
         && request.EmailOrUserName != null
-        && request.Pssword != null
+        && request.Password != null
         && request.LoginProvider.HasValue;
 
     bool IsRefreshTokenRequestValid(AuthenticateUserRequest request) =>

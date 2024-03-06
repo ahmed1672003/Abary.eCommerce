@@ -1,7 +1,7 @@
 ﻿namespace eCommerce.Domain.Entities.Identity;
 
 [Table(name: nameof(EntityName.UserLogin), Schema = nameof(ModuleName.Identity))]
-[PrimaryKey(nameof(LoginProvider), nameof(ProviderKey))]
+[PrimaryKey(nameof(LoginProvider), nameof(ProviderKey), nameof(UserId))]
 public sealed class UserLogin
     : IdentityUserLogin<Guid>,
         ITrackableCreate<Guid>,

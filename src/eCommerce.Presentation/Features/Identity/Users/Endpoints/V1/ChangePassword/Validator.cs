@@ -37,6 +37,16 @@ public class ChangePasswordValidator : Validator<ChangePasswordRequest>
             .Matches(x => x.ConfirmNewPassword)
             .WithMessage("كلمتا المرور غير متطابقتان");
 
+        RuleFor(x => x.NewPassword)
+            .Must(
+                (password) =>
+                {
+                    return password.Count(x => char.IsUpper(x)) >= 1
+                        && password.Count(x => char.IsNumber(x)) >= 1;
+                }
+            )
+            .WithMessage("كلمة المرور الجديدة غير صالحة");
+
         RuleFor(x => x)
             .MustAsync(
                 async (req, ct) =>
@@ -50,7 +60,8 @@ public class ChangePasswordValidator : Validator<ChangePasswordRequest>
                         .Users.AsNoTracking()
                         .FirstOrDefaultAsync(x => x.Id == Guid.Parse(userId));
 
-                    return await userManager.CheckPasswordAsync(user, req.OldPassword);
+                    return !await userManager.CheckPasswordAsync(user, req.NewPassword)
+                        && await userManager.CheckPasswordAsync(user, req.OldPassword);
                 }
             )
             .WithMessage("كلمة المرور خاطئة");

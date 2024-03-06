@@ -7,6 +7,7 @@ using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Create;
 using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Get;
 using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.GetAll;
 using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Register;
+using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Update;
 
 namespace eCommerce.Presentation.Features.Identity.Users.Service;
 
@@ -47,4 +48,7 @@ public sealed class UserService : IUserService
         };
         return _userDaoService.GetAllAsync(request, orderBy, ct);
     }
+
+    public Task<Response> UpdateAsync(UpdateUserRequest request, CancellationToken ct) =>
+        _userDaoService.UpdateAsync(request, ct);
 }

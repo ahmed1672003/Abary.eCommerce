@@ -4,7 +4,7 @@ public sealed record AuthenticateUserRequest
 {
     public string? EmailOrUserName { get; set; }
 
-    public string? Pssword { get; set; }
+    public string? Password { get; set; }
 
     public LoginProvider? LoginProvider { get; set; }
 

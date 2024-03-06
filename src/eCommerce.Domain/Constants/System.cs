@@ -62,7 +62,7 @@ public static class SystemConstants
         public const bool JWT_VALIDATE_ISSUER = true;
         public const bool JWT_VALIDATE_LIFETIME = true;
         public const bool JWT_VALIDATE_ISSUER_SIGN_IN_KEY = true;
-        public const long JWT_ACCESS_TOKEN_EXPIRES_IN = 10;
+        public const long JWT_ACCESS_TOKEN_EXPIRES_IN = 3600;
 
         public static void SetEnvironmentVariables()
         {

@@ -1,4 +1,6 @@
-﻿namespace eCommerce.Persistence.Middlewares;
+﻿using FastEndpoints;
+
+namespace eCommerce.Persistence.Middlewares;
 
 public sealed class ExceptionMiddleware : IMiddleware
 {
@@ -14,7 +16,7 @@ public sealed class ExceptionMiddleware : IMiddleware
         }
     }
 
-    private static Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
+    private static async Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
     {
         int statusCode = GetStatusCode(exception);
         httpContext.Response.StatusCode = statusCode;
@@ -26,9 +28,8 @@ public sealed class ExceptionMiddleware : IMiddleware
             IsSuccess = false
         };
 
-        var result = JsonConvert.SerializeObject(response);
-
-        return httpContext.Response.WriteAsync(result);
+        await httpContext.Response.WriteAsJsonAsync(response);
+        httpContext.MarkResponseStart();
     }
 
     private static int GetStatusCode(Exception exception) =>

@@ -79,7 +79,7 @@ public static class Registeration
                 {
                     IsSuccess = false,
                     StatusCode = statusCode,
-                    Message = errorMsg.Value,
+                    Message = $"{errorMsg.Value}",
                 };
             };
         });

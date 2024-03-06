@@ -13,6 +13,7 @@ using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Create;
 using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Get;
 using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.GetAll;
 using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Register;
+using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Update;
 using eCommerce.Presentation.Json.Service;
 using eCommerce.Presentation.Jwt.Dto;
 using eCommerce.Presentation.Jwt.Service;
@@ -71,6 +72,10 @@ public sealed class UserDaoService : IUserDaoService
             cfg.CreateMap<CreateUserRequest, User>();
             cfg.CreateMap<CreateUserRequest.CreatUserProfile, UserProfile>();
             cfg.CreateMap<CreateUserRequest.CreatUserProfile.CreateAddressRequest, Address>();
+
+            cfg.CreateMap<UpdateUserRequest, User>();
+            cfg.CreateMap<UpdateUserRequest.UpdateUserProfile, UserProfile>();
+            cfg.CreateMap<UpdateUserRequest.UpdateUserProfile.UpdateAddressRequest, Address>();
 
             cfg.CreateMap<User, UserDto>();
             cfg.CreateMap<UserProfile, UserDto.UserProfileDto>();
@@ -172,7 +177,7 @@ public sealed class UserDaoService : IUserDaoService
             var modifiedRows = 0;
             var token = await _userTokens.FirstAsync(x => x.UserId == Guid.Parse(_userId));
 
-            modifiedRows = await _userTokens
+            modifiedRows += await _userTokens
                 .AsNoTracking()
                 .Where(x => x.UserId == Guid.Parse(_userId))
                 .ExecuteDeleteAsync(ct);
@@ -201,9 +206,8 @@ public sealed class UserDaoService : IUserDaoService
         {
             var modifiedRows = 0;
 
-            var user = await _users
-                .AsNoTracking()
-                .Include(x => x.Token)
+            var user = await _userManager
+                .Users.Include(x => x.Token)
                 .FirstAsync(x => x.Id == Guid.Parse(_userId));
 
             var tokenDto = await _jwtService.GenerateTokenAsync(user, LoginProvider.System, ct);
@@ -288,6 +292,60 @@ public sealed class UserDaoService : IUserDaoService
         {
             await transaction.RollbackAsync(ct);
             throw new DatabaseTransactionException(ex.Message);
+        }
+    }
+
+    public async Task<Response> UpdateAsync(UpdateUserRequest request, CancellationToken ct)
+    {
+        var transaction = await _context.BeginTransactionAsync(ct);
+        try
+        {
+            var modifiedRows = 0;
+
+            var user = await _users
+                .AsNoTracking()
+                .Include(x => x.Profile)
+                .ThenInclude(x => x.Address)
+                .FirstAsync(x => x.Id == request.UserId);
+
+            if (user.Profile != null)
+            {
+                modifiedRows++;
+                if (user.Profile.Address != null)
+                {
+                    modifiedRows++;
+                }
+            }
+
+            _mapper.Map(request, user);
+
+            modifiedRows++;
+            _users.Update(user);
+
+            var success = await _context.IsDoneAsync(modifiedRows, ct);
+
+            if (success)
+            {
+                await transaction.CommitAsync(ct);
+
+                var result = _mapper.Map<UserDto>(user);
+
+                return new Response<UserDto>
+                {
+                    IsSuccess = true,
+                    Message = _success,
+                    Result = result
+                };
+            }
+
+            await transaction.RollbackAsync(ct);
+            throw new DatabaseTransactionException();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync(ct);
+
+            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
         }
     }
 
@@ -396,17 +454,6 @@ public sealed class UserDaoService : IUserDaoService
             modifiedRows++;
             await _userTokens.AddAsync(token);
 
-            modifiedRows++;
-            await _userLogins.AddAsync(
-                new UserLogin()
-                {
-                    UserId = user.Id,
-                    LoginProvider = request.LoginProvider.Value.ToString(),
-                    ProviderKey = request.LoginProvider.Value.ToString(),
-                },
-                ct
-            );
-
             var success = await _context.IsDoneAsync(modifiedRows, ct);
 
             if (success)
@@ -444,23 +491,16 @@ public sealed class UserDaoService : IUserDaoService
                 .Include(x => x.Token)
                 .FirstAsync(x => x.Token.RefreshToken == request.RefreshToken, ct);
 
-            var tokenDto = await _jwtService.GenerateTokenAsync(
-                user,
-                request.LoginProvider.Value,
-                ct
-            );
+            var tokenDto = await _jwtService.GenerateTokenAsync(user, LoginProvider.System, ct);
             var token = _mapper.Map<UserToken>(tokenDto);
 
-            modifiedRows += await _userTokens
+            await _userTokens
                 .AsNoTracking()
                 .Where(x => x.UserId == user.Id && x.RefreshToken == request.RefreshToken)
                 .ExecuteDeleteAsync(ct);
 
             modifiedRows++;
             await _userTokens.AddAsync(token);
-
-            modifiedRows++;
-            await _userLogins.AddAsync(new UserLogin() { UserId = user.Id }, ct);
 
             var success = await _context.IsDoneAsync(modifiedRows, ct);
 
@@ -480,5 +520,6 @@ public sealed class UserDaoService : IUserDaoService
             throw new DatabaseTransactionException(ex.Message, ex.InnerException);
         }
     }
+
     #endregion
 }

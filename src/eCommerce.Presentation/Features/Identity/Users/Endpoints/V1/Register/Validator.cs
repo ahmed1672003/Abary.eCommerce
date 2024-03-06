@@ -35,12 +35,7 @@ public class RegisterUserValidator : Validator<RegisterUserRequest>
             .Matches(x => x.ConfirmPassword)
             .WithMessage("كلمتا المرور غير متطابقتان");
 
-        RuleFor(x => x.Email)
-            .Must(email =>
-            {
-                return new EmailAddressAttribute().IsValid(email);
-            })
-            .WithMessage("البريد الألكتروني غير صحيح");
+        RuleFor(x => x).Must(IsPasswordValid).WithMessage("أدخل كلمو مرور قوية");
 
         RuleFor(x => x.Email)
             .Must(email =>
@@ -75,5 +70,13 @@ public class RegisterUserValidator : Validator<RegisterUserRequest>
                 }
             )
             .WithMessage("اسم المستخدم مسجل من قبل");
+    }
+
+    bool IsPasswordValid(RegisterUserRequest request)
+    {
+        return request.Password.Count(x => char.IsNumber(x)) >= 1
+            && request.Password.Count(x => char.IsUpper(x)) >= 1
+            //&& request.Password.Count(x => char.IsSymbol(x)) >= 1
+            && request.Password.Count(x => char.IsLower(x)) >= 1;
     }
 }

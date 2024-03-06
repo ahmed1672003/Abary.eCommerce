@@ -5,6 +5,7 @@ using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Create;
 using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Get;
 using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.GetAll;
 using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Register;
+using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Update;
 
 namespace eCommerce.Presentation.Features.Identity.Users.DaoService;
 
@@ -15,6 +16,7 @@ public interface IUserDaoService
     Task<Response> LogoutAsync(CancellationToken ct);
     Task<Response> ChangePasswordAsync(ChangePasswordRequest request, CancellationToken ct);
     Task<Response> CreatAsync(CreateUserRequest request, CancellationToken ct);
+    Task<Response> UpdateAsync(UpdateUserRequest request, CancellationToken ct);
     Task<Response> GetAsync(GetUserRequest request, CancellationToken ct);
     Task<Response> GetAllAsync(
         GetAllUsersRequest request,
