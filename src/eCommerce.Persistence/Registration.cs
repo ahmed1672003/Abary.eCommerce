@@ -21,10 +21,8 @@ public static class Registration
                             SystemConstants.Database.Localhost.LOCALHOST_DATABASE_CONNECTION_STRING
                         )
                     )
-                //    Environment.GetEnvironmentVariable(
-                //    nameof(
-                //        SystemConstants.Database.Cloud.CLOUD_DATABASE_CONNECTION_STRING
-                //    )
+                //Environment.GetEnvironmentVariable(
+                //    nameof(SystemConstants.Database.Cloud.CLOUD_DATABASE_CONNECTION_STRING)
                 //)
                 );
                 options.AddInterceptors(new CustomSaveChangesInterceptor());

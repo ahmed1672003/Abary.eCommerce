@@ -7,41 +7,19 @@ public static class PermissionSeeder
         CancellationToken ct = default
     )
     {
-        var transaction = await context.BeginTransactionAsync(ct);
-        try
-        {
-            var permissions = context.Set<Permission>();
+        using var transaction = await context.BeginTransactionAsync(ct);
+        var permissions = context.Set<Permission>();
 
-            // shared
-            var fileMetaDataPermissions = GeneratePermissions(
-                ModuleName.Shared,
-                EntityName.FilMetaData
-            );
+        // shared
+        var fileMetaDataPermissions = GeneratePermissions(
+            ModuleName.Shared,
+            EntityName.FilMetaData
+        );
 
-            // Identity
-            var userPermissions = GeneratePermissions(ModuleName.Identity, EntityName.User);
-
-            var seedingPermissions = fileMetaDataPermissions.Union(userPermissions);
-            permissions.AddRange(fileMetaDataPermissions.Union(userPermissions));
-
-            var result = await context.IsDoneAsync(seedingPermissions.Count(), ct);
-
-            if (result)
-            {
-                await transaction.CommitAsync(ct);
-
-                Console.WriteLine("Permissions Seeded Success....");
-                return;
-            }
-
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
-        }
+        // Identity
+        var userPermissions = GeneratePermissions(ModuleName.Identity, EntityName.User);
+        var seedingPermissions = fileMetaDataPermissions.Union(userPermissions);
+        await permissions.AddRangeAsync(fileMetaDataPermissions.Union(userPermissions));
     }
 
     public static List<Permission> GeneratePermissions(ModuleName module, EntityName entity)

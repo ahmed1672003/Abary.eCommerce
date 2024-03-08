@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using eCommerce.Domain.Abstractions.Repositories;
 using eCommerce.Domain.Enums.User;
 using eCommerce.Persistence.Settings;
 using eCommerce.Presentation.Jwt.Dto;
@@ -14,30 +13,21 @@ public sealed class JwtService : IJwtService
 {
     readonly IeCommerceDbContext _context;
     readonly JwtSettings _jwtSettings;
-
     readonly DbSet<User> _users;
     readonly DbSet<UserClaim> _userClaims;
     readonly DbSet<Role> _roles;
     readonly DbSet<UserRole> _userRoles;
     readonly DbSet<UserPermission> _userPermissions;
 
-    public JwtService(
-        IRepository<User> userRepository,
-        IRepository<UserClaim> userClaimRepository,
-        IRepository<Role> roleRepository,
-        IRepository<UserRole> userRoleRepository,
-        IRepository<UserPermission> userPermissionRepository,
-        IeCommerceDbContext context,
-        JwtSettings jwtSettings
-    )
+    public JwtService(IeCommerceDbContext context, JwtSettings jwtSettings)
     {
         _context = context;
+        _jwtSettings = jwtSettings;
         _users = _context.Set<User>();
         _userClaims = _context.Set<UserClaim>();
         _roles = _context.Set<Role>();
         _userRoles = _context.Set<UserRole>();
         _userPermissions = _context.Set<UserPermission>();
-        _jwtSettings = jwtSettings;
     }
 
     public async Task<TokenDto> GenerateTokenAsync(
@@ -111,6 +101,5 @@ public sealed class JwtService : IJwtService
         randomNumberGenerate.GetBytes(randomNumber);
         return string.Concat(Convert.ToBase64String(randomNumber), Guid.NewGuid().ToString());
     }
-
     #endregion
 }

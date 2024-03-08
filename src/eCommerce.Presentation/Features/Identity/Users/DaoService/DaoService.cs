@@ -396,6 +396,16 @@ public sealed class UserDaoService : IUserDaoService
 
             query = query.Paginate(request, orderBy);
 
+            if (!string.IsNullOrEmpty(request.Search))
+            {
+                query = query.Where(x =>
+                    x.UserName.Contains(request.Search.ToLower())
+                    || x.Email.Contains(request.Search.ToLower())
+                    || (x.Profile != null ? x.Profile.FirstName.Contains(request.Search) : false)
+                    || (x.Profile != null ? x.Profile.LastName.Contains(request.Search) : false)
+                );
+            }
+
             var userDto = _mapper.Map<IEnumerable<UserDto>>(query);
 
             return new PaginationResponse<IEnumerable<UserDto>>

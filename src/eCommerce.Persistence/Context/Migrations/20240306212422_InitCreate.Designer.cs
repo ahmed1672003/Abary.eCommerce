@@ -13,7 +13,7 @@ using eCommerce.Persistence.Context;
 namespace eCommerce.Persistence.Context.Migrations
 {
     [DbContext(typeof(eCommerceDbContext))]
-    [Migration("20240304210530_InitCreate")]
+    [Migration("20240306212422_InitCreate")]
     partial class InitCreate
     {
         /// <inheritdoc />
@@ -281,6 +281,9 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<string>("ProviderKey")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
@@ -308,10 +311,7 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("LoginProvider", "ProviderKey");
+                    b.HasKey("LoginProvider", "ProviderKey", "UserId");
 
                     b.HasIndex("UserId");
 
