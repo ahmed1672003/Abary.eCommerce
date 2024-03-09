@@ -39,6 +39,6 @@ internal sealed class DeleteUnitValidator : Validator<DeleteUnitRequest>
                         .AnyAsync(x => x.Id == req.Id && !x.Products.Any());
                 }
             )
-            .WithMessage("الوحدة غير موجودة");
+            .WithMessage("لايمكن حذف وحدة مرتبطة بمنتجات");
     }
 }
