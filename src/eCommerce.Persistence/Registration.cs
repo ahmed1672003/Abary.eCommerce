@@ -12,24 +12,19 @@ public static class Registration
         IConfiguration config
     )
     {
-        services.AddDbContext<IeCommerceDbContext, eCommerceDbContext>(
-            options =>
-            {
-                options.UseNpgsql(
-                    Environment.GetEnvironmentVariable(
-                        nameof(
-                            SystemConstants.Database.Localhost.LOCALHOST_DATABASE_CONNECTION_STRING
-                        )
-                    )
-                //Environment.GetEnvironmentVariable(
-                //    nameof(SystemConstants.Database.Cloud.CLOUD_DATABASE_CONNECTION_STRING)
-                //)
-                );
-                options.AddInterceptors(new CustomSaveChangesInterceptor());
-                //   options.EnableSensitiveDataLogging();
-            },
-            ServiceLifetime.Scoped
-        );
+        services.AddDbContextPool<IeCommerceDbContext, eCommerceDbContext>(options =>
+        {
+            options.UseNpgsql(
+                Environment.GetEnvironmentVariable(
+                    nameof(SystemConstants.Database.Localhost.LOCALHOST_DATABASE_CONNECTION_STRING)
+                )
+            //Environment.GetEnvironmentVariable(
+            //    nameof(SystemConstants.Database.Cloud.CLOUD_DATABASE_CONNECTION_STRING)
+            //)
+            );
+            options.AddInterceptors(new CustomSaveChangesInterceptor());
+            //   options.EnableSensitiveDataLogging();
+        });
         services
             .AddIdentity<User, Role>(options =>
             {

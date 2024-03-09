@@ -113,14 +113,35 @@ public static class SystemConstants
                 public static string Update =>
                     $"{ModuleName.Identity}.{FeatureName.User}.{PermissionValue.Update}";
 
+                public static string Delete =>
+                    $"{ModuleName.Identity}.{FeatureName.User}.{PermissionValue.Delete}";
+
                 public static string Get =>
                     $"{ModuleName.Identity}.{FeatureName.User}.{PermissionValue.Get}";
 
                 public static string GetAll =>
                     $"{ModuleName.Identity}.{FeatureName.User}.{PermissionValue.GetAll}";
+            }
+        }
 
-                public static string LogOut =>
-                    $"{ModuleName.Identity}.{FeatureName.User}.{PermissionValue.LogOut}";
+        public static class Inventory
+        {
+            public static class Units
+            {
+                public static string Create =>
+                    $"{ModuleName.Inventory}.{FeatureName.Unit}.{PermissionValue.Create}";
+
+                public static string Update =>
+                    $"{ModuleName.Inventory}.{FeatureName.Unit}.{PermissionValue.Update}";
+
+                public static string Delete =>
+                    $"{ModuleName.Inventory}.{FeatureName.Unit}.{PermissionValue.Delete}";
+
+                public static string Get =>
+                    $"{ModuleName.Inventory}.{FeatureName.Unit}.{PermissionValue.Get}";
+
+                public static string GetAll =>
+                    $"{ModuleName.Inventory}.{FeatureName.Unit}.{PermissionValue.GetAll}";
             }
         }
     }

@@ -3,5 +3,6 @@
 public enum ModuleName
 {
     Identity,
-    Shared
+    Shared,
+    Inventory
 }

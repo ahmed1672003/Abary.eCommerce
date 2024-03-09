@@ -2,11 +2,13 @@
 
 public enum EntityName
 {
+    //  Shared
     Address,
     FilMetaData,
     SocialMedia,
     Notification,
 
+    //  Identity
     User,
     UserProfile,
     Role,
@@ -16,5 +18,17 @@ public enum EntityName
     UserLogin,
     UserToken,
     UserPermission,
-    Permission
+    Permission,
+
+    // Inventory
+    Category,
+    Invoice,
+    InvoiceItem,
+    Product,
+    ProductAttribute,
+    CategoryProduct,
+    Service,
+    Stock,
+    StockProduct,
+    Unit,
 }

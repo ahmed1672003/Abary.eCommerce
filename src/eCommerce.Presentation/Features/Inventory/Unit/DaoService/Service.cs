@@ -1,0 +1,25 @@
+﻿using eCommerce.Presentation.Features.Inventory.Units.Endpoints.V1.Create;
+using eCommerce.Presentation.Features.Inventory.Units.Endpoints.V1.Delete;
+using eCommerce.Presentation.Features.Inventory.Units.Endpoints.V1.Get;
+using eCommerce.Presentation.Features.Inventory.Units.Endpoints.V1.GetAll;
+using eCommerce.Presentation.Features.Inventory.Units.Endpoints.V1.Update;
+
+namespace eCommerce.Presentation.Features.Inventory.Units.DaoService;
+
+public sealed class UnitDaoService : IUnitDaoService
+{
+    public Task<Response> CreateAsync(CreateUnitRequest request, CancellationToken ct) =>
+        throw new NotImplementedException();
+
+    public Task<Response> UpdateAsync(UpdateUnitRequest request, CancellationToken ct) =>
+        throw new NotImplementedException();
+
+    public Task<Response> DeleteAsync(DeleteUnitRequest request, CancellationToken ct) =>
+        throw new NotImplementedException();
+
+    public Task<Response> GetAsync(GetUnitRequest request, CancellationToken ct) =>
+        throw new NotImplementedException();
+
+    public Task<Response> GetAllAsync(GetAllUnitsRequest request, CancellationToken ct) =>
+        throw new NotImplementedException();
+}

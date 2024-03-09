@@ -272,14 +272,11 @@ namespace eCommerce.Persistence.Context.Migrations
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Identity.UserLogin", b =>
                 {
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProviderKey")
-                        .HasColumnType("text");
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
@@ -302,15 +299,17 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("text");
 
+                    b.Property<string>("ProviderKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("LoginProvider", "ProviderKey", "UserId");
-
-                    b.HasIndex("UserId");
+                    b.HasKey("UserId", "LoginProvider");
 
                     b.ToTable("UserLogin", "Identity");
                 });
@@ -509,6 +508,47 @@ namespace eCommerce.Persistence.Context.Migrations
                         .IsUnique();
 
                     b.ToTable("UserToken", "Identity");
+                });
+
+            modelBuilder.Entity("eCommerce.Domain.Entities.Inventory.Unit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name");
+
+                    b.ToTable("Unit", "Inventory");
                 });
 
             modelBuilder.Entity("eCommerce.Domain.Entities.Shared.Address", b =>

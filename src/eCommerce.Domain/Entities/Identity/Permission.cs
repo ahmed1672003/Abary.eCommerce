@@ -1,7 +1,5 @@
 ﻿namespace eCommerce.Domain.Entities.Identity;
 
-[Table(name: nameof(EntityName.Permission), Schema = nameof(ModuleName.Identity))]
-[PrimaryKey(nameof(Id))]
 public sealed class Permission
     : BaseEntity<Guid>,
         ITrackableCreate<Guid>,

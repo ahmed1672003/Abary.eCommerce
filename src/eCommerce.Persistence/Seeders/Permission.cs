@@ -8,18 +8,44 @@ public static class PermissionSeeder
     )
     {
         using var transaction = await context.BeginTransactionAsync(ct);
-        var permissions = context.Set<Permission>();
+        try
+        {
+            var modifiedRows = 0;
+            var permissions = context.Set<Permission>();
 
-        // shared
-        var fileMetaDataPermissions = GeneratePermissions(
-            ModuleName.Shared,
-            EntityName.FilMetaData
-        );
+            // shared
+            var fileMetaDataPermissions = GeneratePermissions(
+                ModuleName.Shared,
+                EntityName.FilMetaData
+            );
 
-        // Identity
-        var userPermissions = GeneratePermissions(ModuleName.Identity, EntityName.User);
-        var seedingPermissions = fileMetaDataPermissions.Union(userPermissions);
-        await permissions.AddRangeAsync(fileMetaDataPermissions.Union(userPermissions));
+            // Identity
+            var userPermissions = GeneratePermissions(ModuleName.Identity, EntityName.User);
+
+            // Inventory
+            var unitPermissions = GeneratePermissions(ModuleName.Inventory, EntityName.Unit);
+
+            var seededPermissions = fileMetaDataPermissions
+                .Union(userPermissions)
+                .Union(unitPermissions);
+
+            modifiedRows += seededPermissions.Count();
+            await permissions.AddRangeAsync(seededPermissions);
+
+            var success = await context.IsDoneAsync(modifiedRows, ct);
+
+            if (success)
+            {
+                await transaction.CommitAsync(ct);
+            }
+            await transaction.RollbackAsync(ct);
+            throw new DatabaseTransactionException();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync(ct);
+            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+        }
     }
 
     public static List<Permission> GeneratePermissions(ModuleName module, EntityName entity)

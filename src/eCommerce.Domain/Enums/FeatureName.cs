@@ -6,5 +6,15 @@ public enum FeatureName
     User,
 
     // Shared
-    File
+    File,
+
+    // Inventory
+    Stock,
+    Service,
+    Category,
+    Product,
+    ProductAttribute,
+    Invoice,
+    InvoiceItem,
+    Unit,
 }

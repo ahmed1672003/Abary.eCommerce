@@ -19,6 +19,9 @@ namespace eCommerce.Persistence.Context.Migrations
             migrationBuilder.EnsureSchema(
                 name: "Identity");
 
+            migrationBuilder.EnsureSchema(
+                name: "Inventory");
+
             migrationBuilder.CreateTable(
                 name: "Address",
                 schema: "Shared",
@@ -165,6 +168,27 @@ namespace eCommerce.Persistence.Context.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Unit",
+                schema: "Inventory",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Unit", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "User",
                 schema: "Identity",
                 columns: table => new
@@ -263,7 +287,6 @@ namespace eCommerce.Persistence.Context.Migrations
                 columns: table => new
                 {
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
-                    ProviderKey = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
@@ -273,11 +296,12 @@ namespace eCommerce.Persistence.Context.Migrations
                     DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    ProviderKey = table.Column<string>(type: "text", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserLogin", x => new { x.LoginProvider, x.ProviderKey, x.UserId });
+                    table.PrimaryKey("PK_UserLogin", x => new { x.UserId, x.LoginProvider });
                     table.ForeignKey(
                         name: "FK_UserLogin_User_UserId",
                         column: x => x.UserId,
@@ -441,15 +465,15 @@ namespace eCommerce.Persistence.Context.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Unit_Name",
+                schema: "Inventory",
+                table: "Unit",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserClaim_UserId",
                 schema: "Identity",
                 table: "UserClaim",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserLogin_UserId",
-                schema: "Identity",
-                table: "UserLogin",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -507,6 +531,10 @@ namespace eCommerce.Persistence.Context.Migrations
             migrationBuilder.DropTable(
                 name: "RoleClaim",
                 schema: "Identity");
+
+            migrationBuilder.DropTable(
+                name: "Unit",
+                schema: "Inventory");
 
             migrationBuilder.DropTable(
                 name: "UserClaim",

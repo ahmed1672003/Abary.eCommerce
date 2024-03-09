@@ -2,6 +2,8 @@
 using eCommerce.Persistence.Middlewares;
 using eCommerce.Presentation.Features.Identity.Users.DaoService;
 using eCommerce.Presentation.Features.Identity.Users.Service;
+using eCommerce.Presentation.Features.Inventory.Units.DaoService;
+using eCommerce.Presentation.Features.Inventory.Units.Service;
 using eCommerce.Presentation.Json.Service;
 using eCommerce.Presentation.Jwt.Service;
 using Microsoft.AspNetCore.Identity;
@@ -20,10 +22,12 @@ public static class Registeration
 
         // DaoService
         services.AddScoped<IUserDaoService, UserDaoService>();
+        services.AddScoped<IUnitDaoService, UnitDaoService>();
 
         // Service
         services
             .AddScoped<IUserService, UserService>()
+            .AddScoped<IUnitService, UnitService>()
             .AddScoped<IJwtService, JwtService>()
             .AddScoped<UserManager<User>>()
             .AddScoped<RoleManager<Role>>()

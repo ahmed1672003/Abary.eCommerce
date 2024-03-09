@@ -7,5 +7,4 @@ public enum PermissionValue
     Delete,
     Get,
     GetAll,
-    LogOut
 }

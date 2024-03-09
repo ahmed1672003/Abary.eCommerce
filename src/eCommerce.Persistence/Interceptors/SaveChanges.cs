@@ -1,4 +1,6 @@
-﻿namespace eCommerce.Persistence.Interceptors;
+﻿using eCommerce.Domain.Bases.Entities;
+
+namespace eCommerce.Persistence.Interceptors;
 
 public sealed class CustomSaveChangesInterceptor : SaveChangesInterceptor
 {
@@ -42,7 +44,7 @@ public sealed class CustomSaveChangesInterceptor : SaveChangesInterceptor
 
         foreach (var entry in eventData.Context.ChangeTracker.Entries())
         {
-            if (entry is not { State: EntityState.Added, Entity: ITrackableCreate<Guid> entity, })
+            if (entry is not { State: EntityState.Added, Entity: ITrackableCreate<Guid> entity })
                 continue;
 
             if (entity.CreatedBy == Guid.Empty)
@@ -50,6 +52,14 @@ public sealed class CustomSaveChangesInterceptor : SaveChangesInterceptor
                 entity.CreatedBy = Guid.Parse(SystemConstants.SYSTEM_KEY);
             }
             await entity.CreateAsync();
+        }
+
+        foreach (var entry in eventData.Context.ChangeTracker.Entries())
+        {
+            if (entry is not { State: EntityState.Added, Entity: BaseEntity<Guid> entity, })
+                continue;
+
+            entity.Id = Guid.NewGuid();
         }
 
         foreach (var entry in eventData.Context.ChangeTracker.Entries())
