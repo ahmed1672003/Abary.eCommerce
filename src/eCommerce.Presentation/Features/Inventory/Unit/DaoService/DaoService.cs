@@ -24,7 +24,6 @@ public sealed class UnitDaoService : IUnitDaoService
     public UnitDaoService(IeCommerceDbContext context)
     {
         _context = context;
-
         _units = _context.Set<Unit>();
 
         var mapperCfg = new MapperConfiguration(cfg =>

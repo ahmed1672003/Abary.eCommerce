@@ -21,18 +21,18 @@ public static class Registeration
         // Fluent Validation
 
         // DaoService
-        services.AddScoped<IUserDaoService, UserDaoService>();
-        services.AddScoped<IUnitDaoService, UnitDaoService>();
+        services.AddTransient<IUserDaoService, UserDaoService>();
+        services.AddTransient<IUnitDaoService, UnitDaoService>();
 
         // Service
         services
-            .AddScoped<IUserService, UserService>()
-            .AddScoped<IUnitService, UnitService>()
-            .AddScoped<IJwtService, JwtService>()
-            .AddScoped<UserManager<User>>()
-            .AddScoped<RoleManager<Role>>()
-            .AddScoped<SignInManager<User>>()
-            .AddScoped<IJsonService, JsonService>();
+            .AddTransient<IUserService, UserService>()
+            .AddTransient<IUnitService, UnitService>()
+            .AddTransient<IJwtService, JwtService>()
+            .AddTransient<UserManager<User>>()
+            .AddTransient<RoleManager<Role>>()
+            .AddTransient<SignInManager<User>>()
+            .AddTransient<IJsonService, JsonService>();
 
         services.AddScoped<TokenMiddleware>();
         services.AddScoped<ExceptionMiddleware>();

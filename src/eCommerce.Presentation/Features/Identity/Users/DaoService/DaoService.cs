@@ -49,8 +49,9 @@ public sealed class UserDaoService : IUserDaoService
         SignInManager<User> signInManager
     )
     {
-        _userManager = userManager;
         _context = context;
+
+        _userManager = userManager;
         _jwtService = jwtService;
         _jsonService = jsonService;
         _signInManager = signInManager;

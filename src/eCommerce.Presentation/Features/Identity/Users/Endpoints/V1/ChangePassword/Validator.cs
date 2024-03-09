@@ -42,6 +42,7 @@ public class ChangePasswordValidator : Validator<ChangePasswordRequest>
                 (password) =>
                 {
                     return password.Count(x => char.IsUpper(x)) >= 1
+                        && password.Count(x => char.IsLower(x)) >= 1
                         && password.Count(x => char.IsNumber(x)) >= 1;
                 }
             )
