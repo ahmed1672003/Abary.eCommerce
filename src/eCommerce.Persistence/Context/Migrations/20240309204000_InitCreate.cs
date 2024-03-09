@@ -17,10 +17,10 @@ namespace eCommerce.Persistence.Context.Migrations
                 name: "Shared");
 
             migrationBuilder.EnsureSchema(
-                name: "Identity");
+                name: "Inventory");
 
             migrationBuilder.EnsureSchema(
-                name: "Inventory");
+                name: "Identity");
 
             migrationBuilder.CreateTable(
                 name: "Address",
@@ -48,6 +48,49 @@ namespace eCommerce.Persistence.Context.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Category",
+                schema: "Inventory",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Category", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Feature",
+                schema: "Inventory",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Feature", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "FilMetaData",
                 schema: "Shared",
                 columns: table => new
@@ -67,6 +110,26 @@ namespace eCommerce.Persistence.Context.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FilMetaData", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Invoice",
+                schema: "Inventory",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    Total = table.Column<decimal>(type: "numeric", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Invoice", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -139,6 +202,28 @@ namespace eCommerce.Persistence.Context.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Role", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Service",
+                schema: "Inventory",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Service", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -222,6 +307,33 @@ namespace eCommerce.Persistence.Context.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Stock",
+                schema: "Inventory",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    AddressId = table.Column<Guid>(type: "uuid", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Stock", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Stock_Address_AddressId",
+                        column: x => x.AddressId,
+                        principalSchema: "Shared",
+                        principalTable: "Address",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RoleClaim",
                 schema: "Identity",
                 columns: table => new
@@ -247,6 +359,35 @@ namespace eCommerce.Persistence.Context.Migrations
                         column: x => x.RoleId,
                         principalSchema: "Identity",
                         principalTable: "Role",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Product",
+                schema: "Inventory",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UnitId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    PurchasePrice = table.Column<decimal>(type: "numeric", nullable: false),
+                    SalePrice = table.Column<decimal>(type: "numeric", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Product", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Product_Unit_UnitId",
+                        column: x => x.UnitId,
+                        principalSchema: "Inventory",
+                        principalTable: "Unit",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -458,6 +599,222 @@ namespace eCommerce.Persistence.Context.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Item",
+                schema: "Inventory",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    InvoiceId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Item", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Item_Invoice_InvoiceId",
+                        column: x => x.InvoiceId,
+                        principalSchema: "Inventory",
+                        principalTable: "Invoice",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Item_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalSchema: "Inventory",
+                        principalTable: "Product",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductCategory",
+                schema: "Inventory",
+                columns: table => new
+                {
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductCategory", x => new { x.ProductId, x.CategoryId });
+                    table.ForeignKey(
+                        name: "FK_ProductCategory_Category_CategoryId",
+                        column: x => x.CategoryId,
+                        principalSchema: "Inventory",
+                        principalTable: "Category",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductCategory_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalSchema: "Inventory",
+                        principalTable: "Product",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductFeature",
+                schema: "Inventory",
+                columns: table => new
+                {
+                    FeatureId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductFeature", x => new { x.ProductId, x.FeatureId });
+                    table.ForeignKey(
+                        name: "FK_ProductFeature_Feature_FeatureId",
+                        column: x => x.FeatureId,
+                        principalSchema: "Inventory",
+                        principalTable: "Feature",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductFeature_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalSchema: "Inventory",
+                        principalTable: "Product",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StockProduct",
+                schema: "Inventory",
+                columns: table => new
+                {
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StockId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Qty = table.Column<int>(type: "integer", nullable: false),
+                    Price = table.Column<int>(type: "integer", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StockProduct", x => new { x.ProductId, x.StockId });
+                    table.ForeignKey(
+                        name: "FK_StockProduct_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalSchema: "Inventory",
+                        principalTable: "Product",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StockProduct_Stock_StockId",
+                        column: x => x.StockId,
+                        principalSchema: "Inventory",
+                        principalTable: "Stock",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ItemService",
+                schema: "Inventory",
+                columns: table => new
+                {
+                    ServiceId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ItemId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ItemService", x => new { x.ServiceId, x.ItemId });
+                    table.ForeignKey(
+                        name: "FK_ItemService_Item_ItemId",
+                        column: x => x.ItemId,
+                        principalSchema: "Inventory",
+                        principalTable: "Item",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ItemService_Service_ServiceId",
+                        column: x => x.ServiceId,
+                        principalSchema: "Inventory",
+                        principalTable: "Service",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Item_InvoiceId",
+                schema: "Inventory",
+                table: "Item",
+                column: "InvoiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Item_ProductId",
+                schema: "Inventory",
+                table: "Item",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ItemService_ItemId",
+                schema: "Inventory",
+                table: "ItemService",
+                column: "ItemId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Product_UnitId",
+                schema: "Inventory",
+                table: "Product",
+                column: "UnitId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductCategory_CategoryId",
+                schema: "Inventory",
+                table: "ProductCategory",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductFeature_FeatureId",
+                schema: "Inventory",
+                table: "ProductFeature",
+                column: "FeatureId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaim_RoleId",
                 schema: "Identity",
@@ -465,10 +822,16 @@ namespace eCommerce.Persistence.Context.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Unit_Name",
+                name: "IX_Stock_AddressId",
                 schema: "Inventory",
-                table: "Unit",
-                column: "Name");
+                table: "Stock",
+                column: "AddressId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockProduct_StockId",
+                schema: "Inventory",
+                table: "StockProduct",
+                column: "StockId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserClaim_UserId",
@@ -525,15 +888,27 @@ namespace eCommerce.Persistence.Context.Migrations
                 schema: "Shared");
 
             migrationBuilder.DropTable(
+                name: "ItemService",
+                schema: "Inventory");
+
+            migrationBuilder.DropTable(
                 name: "Notification",
                 schema: "Shared");
+
+            migrationBuilder.DropTable(
+                name: "ProductCategory",
+                schema: "Inventory");
+
+            migrationBuilder.DropTable(
+                name: "ProductFeature",
+                schema: "Inventory");
 
             migrationBuilder.DropTable(
                 name: "RoleClaim",
                 schema: "Identity");
 
             migrationBuilder.DropTable(
-                name: "Unit",
+                name: "StockProduct",
                 schema: "Inventory");
 
             migrationBuilder.DropTable(
@@ -561,12 +936,28 @@ namespace eCommerce.Persistence.Context.Migrations
                 schema: "Identity");
 
             migrationBuilder.DropTable(
-                name: "Permission",
-                schema: "Identity");
+                name: "Item",
+                schema: "Inventory");
 
             migrationBuilder.DropTable(
-                name: "Address",
-                schema: "Shared");
+                name: "Service",
+                schema: "Inventory");
+
+            migrationBuilder.DropTable(
+                name: "Category",
+                schema: "Inventory");
+
+            migrationBuilder.DropTable(
+                name: "Feature",
+                schema: "Inventory");
+
+            migrationBuilder.DropTable(
+                name: "Stock",
+                schema: "Inventory");
+
+            migrationBuilder.DropTable(
+                name: "Permission",
+                schema: "Identity");
 
             migrationBuilder.DropTable(
                 name: "SocialMedia",
@@ -579,6 +970,22 @@ namespace eCommerce.Persistence.Context.Migrations
             migrationBuilder.DropTable(
                 name: "User",
                 schema: "Identity");
+
+            migrationBuilder.DropTable(
+                name: "Invoice",
+                schema: "Inventory");
+
+            migrationBuilder.DropTable(
+                name: "Product",
+                schema: "Inventory");
+
+            migrationBuilder.DropTable(
+                name: "Address",
+                schema: "Shared");
+
+            migrationBuilder.DropTable(
+                name: "Unit",
+                schema: "Inventory");
         }
     }
 }

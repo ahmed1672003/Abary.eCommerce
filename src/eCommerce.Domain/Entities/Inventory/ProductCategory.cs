@@ -11,7 +11,11 @@ public sealed class ProductCategory
     #endregion
 
     #region Keys
+
+    [ForeignKey(nameof(Product))]
     public Guid ProductId { get; set; }
+
+    [ForeignKey(nameof(Category))]
     public Guid CategoryId { get; set; }
     public Guid CreatedBy { get; set; }
     public Guid DeletedBy { get; set; }

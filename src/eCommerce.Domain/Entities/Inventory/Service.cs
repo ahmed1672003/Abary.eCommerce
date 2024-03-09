@@ -8,7 +8,10 @@ public sealed class Service
         ISoftDeleteable
 {
     #region Ctor
-    public Service() { }
+    public Service()
+    {
+        SerivceItems = new(0);
+    }
     #endregion
 
     #region Keys
@@ -28,6 +31,7 @@ public sealed class Service
     #endregion
 
     #region Navigation Props
+    public List<ItemService> SerivceItems { get; set; }
 
     #endregion
 }

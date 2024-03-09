@@ -143,6 +143,132 @@ public static class SystemConstants
                 public static string GetAll =>
                     $"{ModuleName.Inventory}.{FeatureName.Unit}.{PermissionValue.GetAll}";
             }
+
+            public static class Categories
+            {
+                public static string Create =>
+                    $"{ModuleName.Inventory}.{FeatureName.Category}.{PermissionValue.Create}";
+
+                public static string Update =>
+                    $"{ModuleName.Inventory}.{FeatureName.Category}.{PermissionValue.Update}";
+
+                public static string Delete =>
+                    $"{ModuleName.Inventory}.{FeatureName.Category}.{PermissionValue.Delete}";
+
+                public static string Get =>
+                    $"{ModuleName.Inventory}.{FeatureName.Category}.{PermissionValue.Get}";
+
+                public static string GetAll =>
+                    $"{ModuleName.Inventory}.{FeatureName.Category}.{PermissionValue.GetAll}";
+            }
+
+            public static class Feature
+            {
+                public static string Create =>
+                    $"{ModuleName.Inventory}.{FeatureName.Feature}.{PermissionValue.Create}";
+
+                public static string Update =>
+                    $"{ModuleName.Inventory}.{FeatureName.Feature}.{PermissionValue.Update}";
+
+                public static string Delete =>
+                    $"{ModuleName.Inventory}.{FeatureName.Feature}.{PermissionValue.Delete}";
+
+                public static string Get =>
+                    $"{ModuleName.Inventory}.{FeatureName.Feature}.{PermissionValue.Get}";
+
+                public static string GetAll =>
+                    $"{ModuleName.Inventory}.{FeatureName.Feature}.{PermissionValue.GetAll}";
+            }
+
+            public static class Invoices
+            {
+                public static string Create =>
+                    $"{ModuleName.Inventory}.{FeatureName.Invoice}.{PermissionValue.Create}";
+
+                public static string Update =>
+                    $"{ModuleName.Inventory}.{FeatureName.Invoice}.{PermissionValue.Update}";
+
+                public static string Delete =>
+                    $"{ModuleName.Inventory}.{FeatureName.Invoice}.{PermissionValue.Delete}";
+
+                public static string Get =>
+                    $"{ModuleName.Inventory}.{FeatureName.Invoice}.{PermissionValue.Get}";
+
+                public static string GetAll =>
+                    $"{ModuleName.Inventory}.{FeatureName.Invoice}.{PermissionValue.GetAll}";
+            }
+
+            public static class Items
+            {
+                public static string Create =>
+                    $"{ModuleName.Inventory}.{FeatureName.Item}.{PermissionValue.Create}";
+
+                public static string Update =>
+                    $"{ModuleName.Inventory}.{FeatureName.Item}.{PermissionValue.Update}";
+
+                public static string Delete =>
+                    $"{ModuleName.Inventory}.{FeatureName.Item}.{PermissionValue.Delete}";
+
+                public static string Get =>
+                    $"{ModuleName.Inventory}.{FeatureName.Item}.{PermissionValue.Get}";
+
+                public static string GetAll =>
+                    $"{ModuleName.Inventory}.{FeatureName.Item}.{PermissionValue.GetAll}";
+            }
+
+            public static class Products
+            {
+                public static string Create =>
+                    $"{ModuleName.Inventory}.{FeatureName.Product}.{PermissionValue.Create}";
+
+                public static string Update =>
+                    $"{ModuleName.Inventory}.{FeatureName.Product}.{PermissionValue.Update}";
+
+                public static string Delete =>
+                    $"{ModuleName.Inventory}.{FeatureName.Product}.{PermissionValue.Delete}";
+
+                public static string Get =>
+                    $"{ModuleName.Inventory}.{FeatureName.Product}.{PermissionValue.Get}";
+
+                public static string GetAll =>
+                    $"{ModuleName.Inventory}.{FeatureName.Product}.{PermissionValue.GetAll}";
+            }
+
+            public static class Services
+            {
+                public static string Create =>
+                    $"{ModuleName.Inventory}.{FeatureName.Service}.{PermissionValue.Create}";
+
+                public static string Update =>
+                    $"{ModuleName.Inventory}.{FeatureName.Service}.{PermissionValue.Update}";
+
+                public static string Delete =>
+                    $"{ModuleName.Inventory}.{FeatureName.Service}.{PermissionValue.Delete}";
+
+                public static string Get =>
+                    $"{ModuleName.Inventory}.{FeatureName.Service}.{PermissionValue.Get}";
+
+                public static string GetAll =>
+                    $"{ModuleName.Inventory}.{FeatureName.Service}.{PermissionValue.GetAll}";
+            }
+
+            public static class Stocks
+            {
+                public static string Create =>
+                    $"{ModuleName.Inventory}.{FeatureName.Stock}.{PermissionValue.Create}";
+
+                public static string Update =>
+                    $"{ModuleName.Inventory}.{FeatureName.Stock}.{PermissionValue.Update}";
+
+                public static string Delete =>
+                    $"{ModuleName.Inventory}.{FeatureName.Stock}.{PermissionValue.Delete}";
+
+                public static string Get =>
+                    $"{ModuleName.Inventory}.{FeatureName.Stock}.{PermissionValue.Get}";
+
+                public static string GetAll =>
+                    $"{ModuleName.Inventory}.{FeatureName.Stock}.{PermissionValue.GetAll}";
+            }
         }
     }
 

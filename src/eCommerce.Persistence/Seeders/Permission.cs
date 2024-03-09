@@ -14,20 +14,22 @@ public static class PermissionSeeder
             var permissions = context.Set<Permission>();
 
             // shared
-            var fileMetaDataPermissions = GeneratePermissions(
-                ModuleName.Shared,
-                EntityName.FilMetaData
-            );
+            var sharedPermissions = GeneratePermissions(ModuleName.Shared, EntityName.FilMetaData);
 
             // Identity
-            var userPermissions = GeneratePermissions(ModuleName.Identity, EntityName.User);
+            var identityPermissions = GeneratePermissions(ModuleName.Identity, EntityName.User);
 
             // Inventory
-            var unitPermissions = GeneratePermissions(ModuleName.Inventory, EntityName.Unit);
+            var inventoryPermissions = GeneratePermissions(ModuleName.Inventory, EntityName.Unit)
+                .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Invoice))
+                .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Category))
+                .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Product))
+                .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Service))
+                .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Stock));
 
-            var seededPermissions = fileMetaDataPermissions
-                .Union(userPermissions)
-                .Union(unitPermissions);
+            var seededPermissions = sharedPermissions
+                .Union(identityPermissions)
+                .Union(inventoryPermissions);
 
             modifiedRows += seededPermissions.Count();
             await permissions.AddRangeAsync(seededPermissions);

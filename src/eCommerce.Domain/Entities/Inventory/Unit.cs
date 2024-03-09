@@ -10,7 +10,7 @@ public sealed class Unit
     #region Ctor
     public Unit()
     {
-        //     Products = new(0);
+        Products = new(0);
     }
     #endregion
 
@@ -30,6 +30,6 @@ public sealed class Unit
     #endregion
 
     #region Navigation Props
-    //   public List<Product> Products { get; set; }
+    public List<Product> Products { get; set; }
     #endregion
 }

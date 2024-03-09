@@ -18,11 +18,10 @@ public sealed class Invoice
     public Guid CreatedBy { get; set; }
     public Guid DeletedBy { get; set; }
     public Guid UpdatedBy { get; set; }
-
     #endregion
 
     #region Props
-
+    public decimal Total { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
     public DateTime? UpdatedOn { get; set; }

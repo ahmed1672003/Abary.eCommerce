@@ -1,8 +1,7 @@
 ﻿using eCommerce.Domain.Constants;
-using eCommerce.Presentation.Features.Inventory.Units.Endpoints.V1.Create;
 using eCommerce.Presentation.Features.Inventory.Units.Service;
 
-namespace eCommerce.Presentation.Features.Inventory.Unit.Endpoints.V1.Create;
+namespace eCommerce.Presentation.Features.Inventory.Units.Endpoints.V1.Create;
 
 public sealed class CreateUnitEndpoint : Endpoint<CreateUnitRequest, Response>
 {

@@ -1,13 +1,16 @@
 ﻿using eCommerce.Domain.Entities.Inventory;
+using eCommerce.Presentation.Features.Inventory.Units.Endpoints.V1.Update;
 
 namespace eCommerce.Presentation.Features.Inventory.Units.Endpoints.V1.Create;
 
-internal sealed class CreatUnitValidator : Validator<CreateUnitRequest>
+internal sealed class UpdateUnitValidator : Validator<UpdateUnitRequest>
 {
-    public CreatUnitValidator()
+    public UpdateUnitValidator()
     {
         ClassLevelCascadeMode = CascadeMode.Stop;
         RuleLevelCascadeMode = CascadeMode.Stop;
+
+        RuleFor(x => x.Id).NotNull().WithMessage("حدث خطأ").NotEmpty().WithMessage("حدث خطأ");
 
         RuleFor(x => x.Name)
             .NotNull()
@@ -36,7 +39,24 @@ internal sealed class CreatUnitValidator : Validator<CreateUnitRequest>
 
                     var _units = _context.Set<Unit>();
 
-                    return !await _units.AnyAsync(x => x.Name.ToLower().Equals(req.Name.ToLower()));
+                    return await _units.AsNoTracking().AnyAsync(x => x.Id == req.Id);
+                }
+            )
+            .WithMessage("الوحدة غير موجودة");
+
+        RuleFor(x => x)
+            .MustAsync(
+                async (req, ct) =>
+                {
+                    using var _context = Resolve<IeCommerceDbContext>();
+
+                    var _units = _context.Set<Unit>();
+
+                    return !await _units
+                        .AsNoTracking()
+                        .AnyAsync(x =>
+                            x.Name.ToLower().Equals(req.Name.ToLower()) && x.Id != req.Id
+                        );
                 }
             )
             .WithMessage("يوجد لديك وحدة بهذا الاسم");

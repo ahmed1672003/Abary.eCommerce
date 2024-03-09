@@ -141,17 +141,14 @@ public static class Registration
                 var userManager = scope.Resolve<UserManager<User>>();
                 var permissions = context.Set<Permission>();
 
-                if (!await context.EnsureCreatedAsync())
+                if (!await permissions.AnyAsync())
                 {
-                    if (!await permissions.AnyAsync())
-                    {
-                        await PermissionSeeder.SeedPermissionsAsync(context);
-                    }
+                    await PermissionSeeder.SeedPermissionsAsync(context);
+                }
 
-                    if (!await userManager.Users.AnyAsync())
-                    {
-                        await UserSeeder.SeedAsync(context, userManager);
-                    }
+                if (!await userManager.Users.AnyAsync())
+                {
+                    await UserSeeder.SeedAsync(context, userManager);
                 }
             }
         }

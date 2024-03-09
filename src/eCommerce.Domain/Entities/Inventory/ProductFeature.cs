@@ -7,11 +7,13 @@ public sealed class ProductFeature
         ISoftDeleteable
 {
     #region Ctor
-    public ProductFeature() { }
     #endregion
 
     #region Keys
+    [ForeignKey(nameof(Feature))]
     public Guid FeatureId { get; set; }
+
+    [ForeignKey(nameof(Product))]
     public Guid ProductId { get; set; }
     public Guid CreatedBy { get; set; }
     public Guid DeletedBy { get; set; }

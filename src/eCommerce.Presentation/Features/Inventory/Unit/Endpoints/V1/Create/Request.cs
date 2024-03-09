@@ -3,5 +3,5 @@
 public sealed record CreateUnitRequest
 {
     public string Name { get; set; }
-    public string Discreption { get; set; }
+    public string? Description { get; set; }
 }

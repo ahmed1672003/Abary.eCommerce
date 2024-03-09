@@ -9,12 +9,13 @@ public enum FeatureName
     File,
 
     // Inventory
+    Category,
+    Feature,
+    Invoice,
+    Item,
     Stock,
     Service,
-    Category,
     Product,
     ProductAttribute,
-    Invoice,
-    InvoiceItem,
     Unit,
 }
