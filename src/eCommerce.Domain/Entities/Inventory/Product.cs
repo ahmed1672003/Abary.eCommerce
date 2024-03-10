@@ -25,6 +25,12 @@ public sealed class Product
     #endregion
 
     #region Props
+    public List<string> Files { get; set; }
+    public string Barcode { get; set; }
+    public string Currency { get; set; }
+    public decimal Tax { get; set; }
+    public List<string> Photos { get; set; }
+    public decimal MaxDiscount { get; set; }
     public decimal PurchasePrice { get; set; }
     public decimal SalePrice { get; set; }
     public DateTime CreatedOn { get; set; }

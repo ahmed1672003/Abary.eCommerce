@@ -34,6 +34,9 @@ public static class HostingExtension
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
             );
 
+        service.AddScoped<TokenMiddleware>();
+        service.AddScoped<ExceptionMiddleware>();
+
         await service.RegisterePersistence(builder.Configuration);
         return builder.Build();
     }

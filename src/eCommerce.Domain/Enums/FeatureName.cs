@@ -7,6 +7,7 @@ public enum FeatureName
 
     // Shared
     File,
+    Photo,
 
     // Inventory
     Category,

@@ -22,6 +22,8 @@ public sealed class Invoice
 
     #region Props
     public decimal Total { get; set; }
+    public decimal Profit { get; set; }
+
     public DateTime CreatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
     public DateTime? UpdatedOn { get; set; }

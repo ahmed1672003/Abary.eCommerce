@@ -38,8 +38,8 @@ public static class Registeration
             .AddTransient<SignInManager<User>>()
             .AddTransient<IJsonService, JsonService>();
 
-        services.AddScoped<TokenMiddleware>();
-        services.AddScoped<ExceptionMiddleware>();
+        //  services.AddScoped<TokenMiddleware>();
+        //   services.AddScoped<ExceptionMiddleware>();
 
         // Fastendpoints
         services.AddFastEndpoints();

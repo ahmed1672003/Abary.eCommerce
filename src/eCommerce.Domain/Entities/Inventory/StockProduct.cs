@@ -26,6 +26,11 @@ public sealed class StockProduct
     #endregion
 
     #region Props
+    public int LimitStockToNotify { get; set; }
+
+    [ForeignKey(nameof(Vendor))]
+    public Guid VendorId { get; set; }
+    public DateTime ExpirationDate { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
     public DateTime? UpdatedOn { get; set; }
@@ -35,5 +40,6 @@ public sealed class StockProduct
     #region Navigation Props
     public Product Product { get; set; }
     public Stock Stock { get; set; }
+    public Vendor Vendor { get; set; }
     #endregion
 }
