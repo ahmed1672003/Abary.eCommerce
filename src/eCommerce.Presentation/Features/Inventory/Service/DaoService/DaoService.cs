@@ -2,6 +2,7 @@
 using AutoMapper;
 using eCommerce.Domain.Entities.Inventory;
 using eCommerce.Domain.Exceptions;
+using eCommerce.Presentation.Extensions;
 using eCommerce.Presentation.Features.Inventory.Services.Dto;
 using eCommerce.Presentation.Features.Inventory.Services.Endpoints.V1.Create;
 using eCommerce.Presentation.Features.Inventory.Services.Endpoints.V1.Delete;
@@ -174,9 +175,43 @@ public sealed class ServiceDaoService : IServiceDaoService
         }
     }
 
-    public Task<Response> GetAllAsync(
+    public async Task<Response> GetAllAsync(
         GetAllServicesRequest request,
         Expression<Func<Service, object>> orderBy,
         CancellationToken ct
-    ) => throw new NotImplementedException();
+    )
+    {
+        try
+        {
+            var query = _services.AsNoTracking();
+            var totalCount = await query.CountAsync(ct);
+            query = query.Paginate(request, orderBy);
+
+            if (!string.IsNullOrEmpty(request.Search))
+            {
+                query = query.Where(x =>
+                    x.Name.ToLower().Contains(request.Search)
+                    || x.Price.ToString().Contains(request.Search)
+                    || x.Description.ToLower().Contains(request.Search)
+                );
+            }
+
+            var result = _mapper.Map<IEnumerable<Service>>(query);
+
+            return new PaginationResponse<IEnumerable<Service>>
+            {
+                IsSuccess = true,
+                Message = _success,
+                Count = result.Count(),
+                PageNumber = request.Page,
+                PageSize = request.Size,
+                TotalCount = totalCount,
+                Result = result
+            };
+        }
+        catch (Exception ex)
+        {
+            throw new DatabaseExecuteQueryException(ex.Message, ex.InnerException);
+        }
+    }
 }
