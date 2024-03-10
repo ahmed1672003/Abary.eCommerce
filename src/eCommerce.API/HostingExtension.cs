@@ -44,7 +44,7 @@ public static class HostingExtension
     public static WebApplication HostServices(this WebApplication app)
     {
         app.UseCors("All");
-        app.UseMiddleware<TokenMiddleware>();
+        // app.UseMiddleware<TokenMiddleware>();
         app.UseMiddleware<ExceptionMiddleware>();
         app.UsePresentation();
         app.UseAuthentication().UseAuthorization();
