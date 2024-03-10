@@ -13,21 +13,21 @@ public class ChangePasswordValidator : Validator<ChangePasswordRequest>
 
         RuleFor(x => x.OldPassword)
             .NotNull()
-            .WithMessage("حقل كلمة المرور القديمة مطلوب")
+            .WithMessage("كلمة المرور القديمة مطلوب")
             .NotEmpty()
-            .WithMessage("حقل كلمة المرور القديمة مطلوب");
+            .WithMessage("كلمة المرور القديمة مطلوب");
 
         RuleFor(x => x.NewPassword)
             .NotNull()
-            .WithMessage("حقل كلمة المرور الجديدة مطلوب")
+            .WithMessage("كلمة المرور الجديدة مطلوب")
             .NotEmpty()
-            .WithMessage("حقل كلمة المرور الجديدة مطلوب");
+            .WithMessage("كلمة المرور الجديدة مطلوب");
 
         RuleFor(x => x.ConfirmNewPassword)
             .NotNull()
-            .WithMessage("حقل تأكيد كلمة المرور الجديدة مطلوب")
+            .WithMessage("تأكيد كلمة المرور الجديدة مطلوب")
             .NotEmpty()
-            .WithMessage("حقل تأكيد كلمة المرور الجديدة مطلوب");
+            .WithMessage("تأكيد كلمة المرور الجديدة مطلوب");
 
         RuleFor(x => x.OldPassword)
             .NotEqual(x => x.NewPassword)
@@ -42,6 +42,7 @@ public class ChangePasswordValidator : Validator<ChangePasswordRequest>
                 (password) =>
                 {
                     return password.Count(x => char.IsUpper(x)) >= 1
+                        && password.Count(x => char.IsLower(x)) >= 1
                         && password.Count(x => char.IsNumber(x)) >= 1;
                 }
             )

@@ -2,6 +2,10 @@
 using eCommerce.Persistence.Middlewares;
 using eCommerce.Presentation.Features.Identity.Users.DaoService;
 using eCommerce.Presentation.Features.Identity.Users.Service;
+using eCommerce.Presentation.Features.Inventory.Services.DaoService;
+using eCommerce.Presentation.Features.Inventory.Services.Services;
+using eCommerce.Presentation.Features.Inventory.Units.DaoService;
+using eCommerce.Presentation.Features.Inventory.Units.Service;
 using eCommerce.Presentation.Json.Service;
 using eCommerce.Presentation.Jwt.Service;
 using Microsoft.AspNetCore.Identity;
@@ -19,16 +23,20 @@ public static class Registeration
         // Fluent Validation
 
         // DaoService
-        services.AddScoped<IUserDaoService, UserDaoService>();
+        services.AddTransient<IUserDaoService, UserDaoService>();
+        services.AddTransient<IUnitDaoService, UnitDaoService>();
+        services.AddTransient<IServiceDaoService, ServiceDaoService>();
 
         // Service
         services
-            .AddScoped<IUserService, UserService>()
-            .AddScoped<IJwtService, JwtService>()
-            .AddScoped<UserManager<User>>()
-            .AddScoped<RoleManager<Role>>()
-            .AddScoped<SignInManager<User>>()
-            .AddScoped<IJsonService, JsonService>();
+            .AddTransient<IUserService, UserService>()
+            .AddTransient<IUnitService, UnitService>()
+            .AddTransient<IServiceService, ServiceService>()
+            .AddTransient<IJwtService, JwtService>()
+            .AddTransient<UserManager<User>>()
+            .AddTransient<RoleManager<Role>>()
+            .AddTransient<SignInManager<User>>()
+            .AddTransient<IJsonService, JsonService>();
 
         services.AddScoped<TokenMiddleware>();
         services.AddScoped<ExceptionMiddleware>();

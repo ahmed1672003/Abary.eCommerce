@@ -1,7 +1,5 @@
 ﻿namespace eCommerce.Domain.Entities.Shared;
 
-[Table(nameof(EntityName.FilMetaData), Schema = nameof(ModuleName.Shared))]
-[PrimaryKey(nameof(Id))]
 public sealed class FileMetaData
     : BaseEntity<Guid>,
         ITrackableCreate<Guid>,

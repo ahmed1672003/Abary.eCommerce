@@ -49,8 +49,9 @@ public sealed class UserDaoService : IUserDaoService
         SignInManager<User> signInManager
     )
     {
-        _userManager = userManager;
         _context = context;
+
+        _userManager = userManager;
         _jwtService = jwtService;
         _jsonService = jsonService;
         _signInManager = signInManager;
@@ -65,7 +66,7 @@ public sealed class UserDaoService : IUserDaoService
             nameof(CustomeClaimTypes.UserId)
         );
 
-        _success = "Operation Done Successfully";
+        _success = "operation done successfully";
         #region Initial Mapper
         var mapperConfig = new MapperConfiguration(cfg =>
         {
@@ -297,7 +298,7 @@ public sealed class UserDaoService : IUserDaoService
 
     public async Task<Response> UpdateAsync(UpdateUserRequest request, CancellationToken ct)
     {
-        var transaction = await _context.BeginTransactionAsync(ct);
+        using var transaction = await _context.BeginTransactionAsync(ct);
         try
         {
             var modifiedRows = 0;

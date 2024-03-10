@@ -1,6 +1,5 @@
 ﻿namespace eCommerce.Domain.Entities.Identity;
 
-[Table(name: nameof(EntityName.User), Schema = nameof(ModuleName.Identity))]
 public sealed class User
     : IdentityUser<Guid>,
         ITrackableCreate<Guid>,

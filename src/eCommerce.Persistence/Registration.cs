@@ -12,24 +12,19 @@ public static class Registration
         IConfiguration config
     )
     {
-        services.AddDbContext<IeCommerceDbContext, eCommerceDbContext>(
-            options =>
-            {
-                options.UseNpgsql(
-                    Environment.GetEnvironmentVariable(
-                        nameof(
-                            SystemConstants.Database.Localhost.LOCALHOST_DATABASE_CONNECTION_STRING
-                        )
-                    )
+        services.AddDbContextPool<IeCommerceDbContext, eCommerceDbContext>(options =>
+        {
+            options.UseNpgsql(
                 //Environment.GetEnvironmentVariable(
-                //    nameof(SystemConstants.Database.Cloud.CLOUD_DATABASE_CONNECTION_STRING)
+                //    nameof(SystemConstants.Database.Localhost.LOCALHOST_DATABASE_CONNECTION_STRING)
                 //)
-                );
-                options.AddInterceptors(new CustomSaveChangesInterceptor());
-                //   options.EnableSensitiveDataLogging();
-            },
-            ServiceLifetime.Scoped
-        );
+                Environment.GetEnvironmentVariable(
+                    nameof(SystemConstants.Database.Cloud.CLOUD_DATABASE_CONNECTION_STRING)
+                )
+            );
+            options.AddInterceptors(new CustomSaveChangesInterceptor());
+            //   options.EnableSensitiveDataLogging();
+        });
         services
             .AddIdentity<User, Role>(options =>
             {
@@ -146,17 +141,14 @@ public static class Registration
                 var userManager = scope.Resolve<UserManager<User>>();
                 var permissions = context.Set<Permission>();
 
-                if (!await context.EnsureCreatedAsync())
+                if (!await permissions.AnyAsync())
                 {
-                    if (!await permissions.AnyAsync())
-                    {
-                        await PermissionSeeder.SeedPermissionsAsync(context);
-                    }
+                    await PermissionSeeder.SeedPermissionsAsync(context);
+                }
 
-                    if (!await userManager.Users.AnyAsync())
-                    {
-                        await UserSeeder.SeedAsync(context, userManager);
-                    }
+                if (!await userManager.Users.AnyAsync())
+                {
+                    await UserSeeder.SeedAsync(context, userManager);
                 }
             }
         }

@@ -1,4 +1,4 @@
-﻿namespace eCommerce.Domain.Enums.User;
+﻿namespace eCommerce.Domain.Enums.Identity.User;
 
 public enum UserOrderBy
 {

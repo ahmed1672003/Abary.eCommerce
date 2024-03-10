@@ -9,10 +9,9 @@ public static class UserSeeder
     )
     {
         await SeedDeveloperAsync(context, userManager, ct);
-        Console.WriteLine("Users Seeded Success....");
     }
 
-    public static async Task SeedDeveloperAsync(
+    private static async Task SeedDeveloperAsync(
         IeCommerceDbContext context,
         UserManager<User> userManager,
         CancellationToken ct = default
@@ -34,6 +33,6 @@ public static class UserSeeder
             UserPremissions = await permissions.ToListAsync(ct)
         };
 
-        await userManager.CreateAsync(developer, SystemConstants.Developer.PASSWORD);
+        var success = await userManager.CreateAsync(developer, SystemConstants.Developer.PASSWORD);
     }
 }

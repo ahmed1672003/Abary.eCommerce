@@ -1,7 +1,5 @@
 ﻿namespace eCommerce.Domain.Entities.Shared;
 
-[Table(nameof(EntityName.Notification), Schema = nameof(ModuleName.Shared))]
-[PrimaryKey(nameof(Id))]
 public sealed class Notification
     : BaseEntity<Guid>,
         ITrackableCreate<Guid>,
@@ -10,7 +8,6 @@ public sealed class Notification
         ITrackableUpdate<Guid>
 {
     #region Ctor
-    public Notification() => Id = Guid.NewGuid();
     #endregion
 
     #region Keys

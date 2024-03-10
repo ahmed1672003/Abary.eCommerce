@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using eCommerce.Domain.Enums.User;
+using eCommerce.Domain.Enums.Identity.User;
 using eCommerce.Persistence.Settings;
 using eCommerce.Presentation.Jwt.Dto;
 using Microsoft.IdentityModel.Tokens;

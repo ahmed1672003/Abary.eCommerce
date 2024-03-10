@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Login;
 
-public sealed class LoginUserValidator : Validator<AuthenticateUserRequest>
+public sealed class AuthenticateUserValidator : Validator<AuthenticateUserRequest>
 {
-    public LoginUserValidator()
+    public AuthenticateUserValidator()
     {
         ClassLevelCascadeMode = CascadeMode.Stop;
         RuleLevelCascadeMode = CascadeMode.Stop;

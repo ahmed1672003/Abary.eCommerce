@@ -1,7 +1,5 @@
 ﻿namespace eCommerce.Domain.Entities.Shared;
 
-[Table(nameof(EntityName.SocialMedia), Schema = nameof(ModuleName.Shared))]
-[PrimaryKey(nameof(Id))]
 public sealed class SocialMedia
     : BaseEntity<Guid>,
         ITrackableCreate<Guid>,

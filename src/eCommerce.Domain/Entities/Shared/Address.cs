@@ -1,7 +1,5 @@
 ﻿namespace eCommerce.Domain.Entities.Shared;
 
-[Table(nameof(EntityName.Address), Schema = nameof(ModuleName.Shared))]
-[PrimaryKey(nameof(Id))]
 public sealed class Address
     : BaseEntity<Guid>,
         ITrackableCreate<Guid>,
@@ -10,7 +8,6 @@ public sealed class Address
         ITrackableUpdate<Guid>
 {
     #region Ctor
-    public Address() => Id = Guid.NewGuid();
     #endregion
 
     #region Keys

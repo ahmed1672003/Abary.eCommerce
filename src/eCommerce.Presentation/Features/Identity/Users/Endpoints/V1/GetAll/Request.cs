@@ -1,5 +1,5 @@
 ﻿using eCommerce.Domain.Bases.Request;
-using eCommerce.Domain.Enums.User;
+using eCommerce.Domain.Enums.Identity.User;
 
 namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.GetAll;
 

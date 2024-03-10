@@ -1,15 +1,13 @@
-﻿using eCommerce.Domain.Enums.User;
+﻿using eCommerce.Domain.Enums.Identity.User;
 
 namespace eCommerce.Domain.Entities.Identity;
 
-[Table(nameof(EntityName.UserToken), Schema = nameof(ModuleName.Identity))]
-[PrimaryKey(nameof(Id))]
 public sealed class UserToken
     : IdentityUserToken<Guid>,
         ITrackableCreate<Guid>,
-        ISoftDeleteable,
         ITrackableDelete<Guid>,
-        ITrackableUpdate<Guid>
+        ITrackableUpdate<Guid>,
+        ISoftDeleteable
 {
     #region Ctor
     public UserToken()
