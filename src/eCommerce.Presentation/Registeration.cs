@@ -2,6 +2,8 @@
 using eCommerce.Persistence.Middlewares;
 using eCommerce.Presentation.Features.Identity.Users.DaoService;
 using eCommerce.Presentation.Features.Identity.Users.Service;
+using eCommerce.Presentation.Features.Inventory.Services.DaoService;
+using eCommerce.Presentation.Features.Inventory.Services.Services;
 using eCommerce.Presentation.Features.Inventory.Units.DaoService;
 using eCommerce.Presentation.Features.Inventory.Units.Service;
 using eCommerce.Presentation.Json.Service;
@@ -23,11 +25,13 @@ public static class Registeration
         // DaoService
         services.AddTransient<IUserDaoService, UserDaoService>();
         services.AddTransient<IUnitDaoService, UnitDaoService>();
+        services.AddTransient<IServiceDaoService, ServiceDaoService>();
 
         // Service
         services
             .AddTransient<IUserService, UserService>()
             .AddTransient<IUnitService, UnitService>()
+            .AddTransient<IServiceService, ServiceService>()
             .AddTransient<IJwtService, JwtService>()
             .AddTransient<UserManager<User>>()
             .AddTransient<RoleManager<Role>>()
