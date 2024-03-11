@@ -174,6 +174,10 @@ public sealed class UnitDaoService : IUnitDaoService
             var totalCount = await query.CountAsync(ct);
 
             query = query.Paginate(request, orderBy);
+            if (request.IsDeleted)
+            {
+                query = query.IgnoreQueryFilters().Where(x => x.IsDeleted);
+            }
 
             if (!string.IsNullOrEmpty(request.Search))
                 query = query.Where(x => x.Name.ToLower().Contains(request.Search.ToLower()));

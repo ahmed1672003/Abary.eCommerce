@@ -397,6 +397,11 @@ public sealed class UserDaoService : IUserDaoService
 
             query = query.Paginate(request, orderBy);
 
+            if (request.IsDeleted)
+            {
+                query = query.IgnoreQueryFilters().Where(x => x.IsDeleted);
+            }
+
             if (!string.IsNullOrEmpty(request.Search))
             {
                 query = query.Where(x =>

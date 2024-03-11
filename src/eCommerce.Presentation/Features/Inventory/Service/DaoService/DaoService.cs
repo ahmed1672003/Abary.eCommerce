@@ -52,7 +52,6 @@ public sealed class ServiceDaoService : IServiceDaoService
 
             modifiedRows++;
             var entry = await _services.AddAsync(service);
-
             service = entry.Entity;
 
             var success = await _context.IsDoneAsync(modifiedRows, ct);
@@ -123,14 +122,12 @@ public sealed class ServiceDaoService : IServiceDaoService
 
     public async Task<Response> DeleteAsync(DeleteServiceRequest request, CancellationToken ct)
     {
-        var transaction = await _context.BeginTransactionAsync(ct);
+        using var transaction = await _context.BeginTransactionAsync(ct);
         try
         {
             var modifiedRows = 0;
 
             var service = await _services.AsNoTracking().FirstAsync(x => x.Id == request.Id);
-
-            _mapper.Map(request, service);
 
             modifiedRows++;
             _services.Remove(service);
@@ -187,6 +184,11 @@ public sealed class ServiceDaoService : IServiceDaoService
             var totalCount = await query.CountAsync(ct);
             query = query.Paginate(request, orderBy);
 
+            if (request.IsDeleted)
+            {
+                query = query.IgnoreQueryFilters().Where(x => x.IsDeleted);
+            }
+
             if (!string.IsNullOrEmpty(request.Search))
             {
                 query = query.Where(x =>
@@ -196,9 +198,9 @@ public sealed class ServiceDaoService : IServiceDaoService
                 );
             }
 
-            var result = _mapper.Map<IEnumerable<Service>>(query);
+            var result = _mapper.Map<IEnumerable<ServiceDto>>(query);
 
-            return new PaginationResponse<IEnumerable<Service>>
+            return new PaginationResponse<IEnumerable<ServiceDto>>
             {
                 IsSuccess = true,
                 Message = _success,
