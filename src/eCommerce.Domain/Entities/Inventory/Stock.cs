@@ -15,18 +15,15 @@ public sealed class Stock
     #endregion
 
     #region Keys
+    [ForeignKey(nameof(Address))]
+    public Guid? AddressId { get; set; }
     public Guid CreatedBy { get; set; }
     public Guid DeletedBy { get; set; }
     public Guid UpdatedBy { get; set; }
-
     #endregion
 
     #region Props
     public string Name { get; set; }
-
-    [ForeignKey(nameof(Address))]
-    public Guid? AddressId { get; set; }
-
     public DateTime CreatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
     public DateTime? UpdatedOn { get; set; }
