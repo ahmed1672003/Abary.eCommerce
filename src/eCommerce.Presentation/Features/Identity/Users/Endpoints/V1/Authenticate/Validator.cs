@@ -13,30 +13,30 @@ public sealed class AuthenticateUserValidator : Validator<AuthenticateUserReques
         RuleFor(x => x)
             .Must(req => (IsRefreshTokenRequestValid(req)))
             .When(req => !IsLoginRequestValid(req))
-            .WithMessage("عيب اللي بتعمله دا ينقاش");
+            .WithMessage("invalid reequest");
 
         RuleFor(x => x)
             .Must(req => (IsLoginRequestValid(req)))
             .When(req => !IsRefreshTokenRequestValid(req))
-            .WithMessage("عيب اللي بتعمله دا ينقاش");
+            .WithMessage("invalid reequest");
 
         RuleFor(x => x.EmailOrUserName)
             .NotEmpty()
-            .WithMessage("الحقل مطلوب")
+            .WithMessage("is required")
             .NotNull()
-            .WithMessage("الحقل مطلوب")
+            .WithMessage("is required")
             .When(x => x.RefreshToken == null && x.EmailOrUserName != null);
 
         RuleFor(x => x.Password)
             .NotEmpty()
-            .WithMessage("الحقل مطلوب")
+            .WithMessage("is required")
             .NotNull()
-            .WithMessage("الحقل مطلوب")
+            .WithMessage("is required")
             .When(x => x.RefreshToken == null && x.Password != null);
 
         RuleFor(x => x.LoginProvider)
             .IsInEnum()
-            .WithMessage("نوع خدمة تسجيل الدخول غير صالحة")
+            .WithMessage("login provider is not valid")
             .When(x => x.RefreshToken == null && x.LoginProvider.HasValue);
 
         RuleFor(x => x)
@@ -49,7 +49,7 @@ public sealed class AuthenticateUserValidator : Validator<AuthenticateUserReques
                         .AnyAsync(x => x.RefreshToken == req.RefreshToken && x.IsRevoked);
                 }
             )
-            .WithMessage("من فضلك أعد تسجيل الدخول")
+            .WithMessage("login again")
             .When(IsRefreshTokenRequestValid);
 
         RuleFor(x => x)
@@ -71,7 +71,7 @@ public sealed class AuthenticateUserValidator : Validator<AuthenticateUserReques
                     return user != null && await userManager.CheckPasswordAsync(user, req.Password);
                 }
             )
-            .WithMessage("البيانات غير صحيحة")
+            .WithMessage("incorrect data")
             .When(IsLoginRequestValid);
     }
 
