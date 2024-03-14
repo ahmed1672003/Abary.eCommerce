@@ -18,6 +18,6 @@ internal sealed class GetServiceValidator : Validator<GetServiceRequest>
                     return await _services.AsNoTracking().AnyAsync(x => x.Id.Equals(req.Id), ct);
                 }
             )
-            .WithMessage("الوحدة غير موجودة");
+            .WithMessage("الخدمة غير موجودة");
     }
 }

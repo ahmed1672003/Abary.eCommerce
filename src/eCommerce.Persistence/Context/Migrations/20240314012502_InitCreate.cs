@@ -862,6 +862,20 @@ namespace eCommerce.Persistence.Context.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_User_Email",
+                schema: "Identity",
+                table: "User",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_UserName",
+                schema: "Identity",
+                table: "User",
+                column: "UserName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserClaim_UserId",
                 schema: "Identity",
                 table: "UserClaim",

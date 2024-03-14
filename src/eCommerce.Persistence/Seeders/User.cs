@@ -1,20 +1,42 @@
 ﻿namespace eCommerce.Persistence.Seeders;
 
-public static class UserSeeder
+public class UserSeeder
 {
-    public static async Task SeedAsync(
+    public static async Task<int> SeedAsync(
         IeCommerceDbContext context,
         UserManager<User> userManager,
         CancellationToken ct = default
     )
     {
-        await SeedDeveloperAsync(context, userManager, ct);
+        return await SeedDeveloperAsync(context, userManager, ct);
     }
 
-    private static async Task SeedDeveloperAsync(
+    private static async Task<int> SeedDeveloperAsync(
         IeCommerceDbContext context,
         UserManager<User> userManager,
         CancellationToken ct = default
+    )
+    {
+        List<User> users = new(0);
+
+        users.Add(await PrepareDeveloper(context, userManager, ct));
+
+        await context.Set<User>().AddRangeAsync(users);
+
+        var modifiedRows = users.Count();
+
+        foreach (var user in users)
+        {
+            modifiedRows += user.UserPremissions.Count();
+        }
+
+        return modifiedRows;
+    }
+
+    static async Task<User> PrepareDeveloper(
+        IeCommerceDbContext context,
+        UserManager<User> userManager,
+        CancellationToken ct
     )
     {
         var permissions = context
@@ -33,6 +55,11 @@ public static class UserSeeder
             UserPremissions = await permissions.ToListAsync(ct)
         };
 
-        var success = await userManager.CreateAsync(developer, SystemConstants.Developer.PASSWORD);
+        developer.PasswordHash = userManager.PasswordHasher.HashPassword(
+            developer,
+            SystemConstants.Developer.PASSWORD
+        );
+
+        return developer;
     }
 }

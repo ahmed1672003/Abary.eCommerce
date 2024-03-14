@@ -222,6 +222,12 @@ namespace eCommerce.Persistence.Context.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
+
                     b.ToTable("User", "Identity");
                 });
 

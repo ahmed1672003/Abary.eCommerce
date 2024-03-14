@@ -13,7 +13,7 @@ using eCommerce.Persistence.Context;
 namespace eCommerce.Persistence.Context.Migrations
 {
     [DbContext(typeof(eCommerceDbContext))]
-    [Migration("20240314010555_InitCreate")]
+    [Migration("20240314012502_InitCreate")]
     partial class InitCreate
     {
         /// <inheritdoc />
@@ -224,6 +224,12 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
 
                     b.ToTable("User", "Identity");
                 });

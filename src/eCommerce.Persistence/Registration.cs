@@ -138,20 +138,65 @@ public static class Registration
         {
             using (var context = scope.Resolve<IeCommerceDbContext>())
             {
-                var userManager = scope.Resolve<UserManager<User>>();
-                var permissions = context.Set<Permission>();
-
-                if (!await permissions.AnyAsync())
+                using (var transaction = await context.BeginTransactionAsync(default))
                 {
-                    await PermissionSeeder.SeedPermissionsAsync(context);
+                    try
+                    {
+                        var modifiedRows = 0;
+                        var userManager = scope.Resolve<UserManager<User>>();
+                        var permissions = context.Set<Permission>();
+
+                        if (!await permissions.AnyAsync())
+                        {
+                            modifiedRows += await PermissionSeeder.SeedPermissionsAsync(context);
+                        }
+                        var success = await context.IsDoneAsync(modifiedRows, default);
+                        if (success)
+                        {
+                            await transaction.CommitAsync(default);
+                        }
+                        else
+                        {
+                            await transaction.RollbackAsync(default);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        await transaction.RollbackAsync(default);
+                    }
                 }
 
-                if (!await userManager.Users.AnyAsync())
+                using (var transaction = await context.BeginTransactionAsync(default))
                 {
-                    await UserSeeder.SeedAsync(context, userManager);
+                    try
+                    {
+                        var modifiedRows = 0;
+                        var userManager = scope.Resolve<UserManager<User>>();
+                        var permissions = context.Set<Permission>();
+
+                        if (!await userManager.Users.AnyAsync())
+                        {
+                            modifiedRows += await UserSeeder.SeedAsync(context, userManager);
+                        }
+                        var success = await context.IsDoneAsync(modifiedRows, default);
+
+                        if (success)
+                        {
+                            await transaction.CommitAsync(default);
+                        }
+                        else
+                        {
+                            await transaction.RollbackAsync(default);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        await transaction.RollbackAsync(default);
+                    }
                 }
             }
         }
+
         return services;
     }
 }
