@@ -13,7 +13,7 @@ using eCommerce.Persistence.Context;
 namespace eCommerce.Persistence.Context.Migrations
 {
     [DbContext(typeof(eCommerceDbContext))]
-    [Migration("20240309233755_InitCreate")]
+    [Migration("20240314010555_InitCreate")]
     partial class InitCreate
     {
         /// <inheritdoc />
@@ -549,6 +549,9 @@ namespace eCommerce.Persistence.Context.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Category", "Inventory");
                 });
 
@@ -591,6 +594,9 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Feature", "Inventory");
                 });
@@ -889,6 +895,9 @@ namespace eCommerce.Persistence.Context.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Service", "Inventory");
                 });
 
@@ -1010,6 +1019,9 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Unit", "Inventory");
                 });

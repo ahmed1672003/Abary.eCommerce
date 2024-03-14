@@ -9,6 +9,7 @@ internal sealed class CatgeoryConfig : IEntityTypeConfiguration<Category>
         builder.ToTable(nameof(EntityName.Category), nameof(ModuleName.Inventory));
 
         builder.HasKey(x => x.Id);
+        builder.HasIndex(x => x.Name).IsUnique(true);
         builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }

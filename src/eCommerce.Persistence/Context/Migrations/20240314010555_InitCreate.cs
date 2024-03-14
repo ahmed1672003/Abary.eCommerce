@@ -780,6 +780,20 @@ namespace eCommerce.Persistence.Context.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Category_Name",
+                schema: "Inventory",
+                table: "Category",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Feature_Name",
+                schema: "Inventory",
+                table: "Feature",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Item_InvoiceId",
                 schema: "Inventory",
                 table: "Item",
@@ -822,6 +836,13 @@ namespace eCommerce.Persistence.Context.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Service_Name",
+                schema: "Inventory",
+                table: "Service",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Stock_AddressId",
                 schema: "Inventory",
                 table: "Stock",
@@ -832,6 +853,13 @@ namespace eCommerce.Persistence.Context.Migrations
                 schema: "Inventory",
                 table: "StockProduct",
                 column: "StockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Unit_Name",
+                schema: "Inventory",
+                table: "Unit",
+                column: "Name",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserClaim_UserId",

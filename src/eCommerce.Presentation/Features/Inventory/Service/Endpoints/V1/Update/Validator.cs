@@ -1,14 +1,14 @@
 ﻿using eCommerce.Domain.Entities.Inventory;
 
-namespace eCommerce.Presentation.Features.Inventory.Services.Endpoints.V1.Create;
+namespace eCommerce.Presentation.Features.Inventory.Services.Endpoints.V1.Update;
 
-internal sealed class CreateServiceValidator : Validator<CreateServiceRequest>
+internal sealed class UpdateServiceValidator : Validator<UpdateServiceRequest>
 {
-    public CreateServiceValidator()
+    public UpdateServiceValidator()
     {
         ClassLevelCascadeMode = CascadeMode.Stop;
         RuleLevelCascadeMode = CascadeMode.Stop;
-        var _context = Resolve<IeCommerceDbContext>();
+        using var _context = Resolve<IeCommerceDbContext>();
         var _services = _context.Set<Service>();
 
         RuleFor(x => x.Name)
@@ -38,11 +38,24 @@ internal sealed class CreateServiceValidator : Validator<CreateServiceRequest>
 
         RuleFor(x => x)
             .MustAsync(
+                (req, ct) =>
+                {
+                    return _services.AsNoTracking().AnyAsync(x => x.Id.Equals(req.Id), ct);
+                }
+            )
+            .WithMessage("الخدمة غير موجودة");
+
+        RuleFor(x => x)
+            .MustAsync(
                 async (req, ct) =>
                 {
                     return !await _services
                         .AsNoTracking()
-                        .AnyAsync(x => x.Name.ToLower().Equals(req.Name.ToLower()), ct);
+                        .AnyAsync(
+                            x =>
+                                x.Name.ToLower().Equals(req.Name.ToLower()) && !x.Id.Equals(req.Id),
+                            ct
+                        );
                 }
             )
             .WithMessage("توجد خدمة بهذا الاسم");
