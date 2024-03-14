@@ -2,52 +2,34 @@
 
 public static class PermissionSeeder
 {
-    public static async Task SeedPermissionsAsync(
+    public static async Task<int> SeedPermissionsAsync(
         IeCommerceDbContext context,
         CancellationToken ct = default
     )
     {
-        using var transaction = await context.BeginTransactionAsync(ct);
-        try
-        {
-            var modifiedRows = 0;
-            var permissions = context.Set<Permission>();
+        var permissions = context.Set<Permission>();
 
-            // shared
-            var sharedPermissions = GeneratePermissions(ModuleName.Shared, EntityName.FilMetaData);
+        // shared
+        var sharedPermissions = GeneratePermissions(ModuleName.Shared, EntityName.FilMetaData);
 
-            // Identity
-            var identityPermissions = GeneratePermissions(ModuleName.Identity, EntityName.User);
+        // Identity
+        var identityPermissions = GeneratePermissions(ModuleName.Identity, EntityName.User);
 
-            // Inventory
-            var inventoryPermissions = GeneratePermissions(ModuleName.Inventory, EntityName.Unit)
-                .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Invoice))
-                .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Category))
-                .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Product))
-                .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Service))
-                .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Stock));
+        // Inventory
+        var inventoryPermissions = GeneratePermissions(ModuleName.Inventory, EntityName.Unit)
+            .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Invoice))
+            .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Category))
+            .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Product))
+            .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Service))
+            .Union(GeneratePermissions(ModuleName.Inventory, EntityName.Stock));
 
-            var seededPermissions = sharedPermissions
-                .Union(identityPermissions)
-                .Union(inventoryPermissions);
+        var seededPermissions = sharedPermissions
+            .Union(identityPermissions)
+            .Union(inventoryPermissions);
 
-            modifiedRows += seededPermissions.Count();
-            await permissions.AddRangeAsync(seededPermissions);
+        await permissions.AddRangeAsync(seededPermissions);
 
-            var success = await context.IsDoneAsync(modifiedRows, ct);
-
-            if (success)
-            {
-                await transaction.CommitAsync(ct);
-            }
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
-        }
+        return seededPermissions.Count();
     }
 
     public static List<Permission> GeneratePermissions(ModuleName module, EntityName entity)
