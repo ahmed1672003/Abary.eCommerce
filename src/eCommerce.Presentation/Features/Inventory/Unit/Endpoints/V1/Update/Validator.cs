@@ -27,7 +27,7 @@ internal sealed class UpdateUnitValidator : Validator<UpdateUnitRequest>
         RuleFor(x => x.Description)
             .MaximumLength(3000)
             .WithMessage("غير مسموح بأكثر من 3000 حرف")
-            .MaximumLength(1)
+            .MinimumLength(0)
             .WithMessage("غير مسموح بأقل من حرف")
             .When(req => !string.IsNullOrEmpty(req.Description));
 
@@ -54,8 +54,10 @@ internal sealed class UpdateUnitValidator : Validator<UpdateUnitRequest>
 
                     return !await _units
                         .AsNoTracking()
-                        .AnyAsync(x =>
-                            x.Name.ToLower().Equals(req.Name.ToLower()) && x.Id != req.Id
+                        .AnyAsync(
+                            x =>
+                                x.Name.ToLower().Equals(req.Name.ToLower()) && !x.Id.Equals(req.Id),
+                            ct
                         );
                 }
             )

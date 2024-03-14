@@ -8,6 +8,7 @@ internal sealed class FeatureConfig : IEntityTypeConfiguration<Feature>
     {
         builder.ToTable(nameof(EntityName.Feature), nameof(ModuleName.Inventory));
         builder.HasKey(x => x.Id);
+        builder.HasIndex(x => x.Name).IsUnique(true);
         builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }

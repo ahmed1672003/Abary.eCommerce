@@ -24,7 +24,7 @@ internal sealed class CreatUnitValidator : Validator<CreateUnitRequest>
         RuleFor(x => x.Description)
             .MaximumLength(3000)
             .WithMessage("غير مسموح بأكثر من 3000 حرف")
-            .MaximumLength(1)
+            .MinimumLength(0)
             .WithMessage("غير مسموح بأقل من حرف")
             .When(req => !string.IsNullOrEmpty(req.Description));
 

@@ -46,6 +46,7 @@ public sealed class ServiceDaoService : IServiceDaoService
         using var transaction = await _context.BeginTransactionAsync(ct);
         try
         {
+            await Task.Delay(5000);
             var modifiedRows = 0;
 
             var service = _mapper.Map<Service>(request);
@@ -85,6 +86,8 @@ public sealed class ServiceDaoService : IServiceDaoService
         var transaction = await _context.BeginTransactionAsync(ct);
         try
         {
+            await Task.Delay(5000);
+
             var modifiedRows = 0;
 
             var service = await _services.AsNoTracking().FirstAsync(x => x.Id == request.Id);
