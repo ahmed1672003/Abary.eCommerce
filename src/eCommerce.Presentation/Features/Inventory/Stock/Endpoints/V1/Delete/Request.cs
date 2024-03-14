@@ -1,3 +1,3 @@
 ﻿namespace eCommerce.Presentation.Features.Inventory.Stocks.Endpoints.V1.Delete;
 
-internal sealed class DeleteStockRequest { }
+public sealed class DeleteStockRequest { }
