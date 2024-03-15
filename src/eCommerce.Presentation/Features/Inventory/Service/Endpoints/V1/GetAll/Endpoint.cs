@@ -8,6 +8,7 @@ internal sealed class GetAllServicesEndpoint : Endpoint<GetAllServicesRequest, R
 {
     public override void Configure()
     {
+        Version(1);
         Get($"{nameof(ModuleName.Inventory)}/{nameof(FeatureName.Service)}/{nameof(GetAll)}");
         Permissions(SystemConstants.Security.Inventory.Services.GetAll);
     }
