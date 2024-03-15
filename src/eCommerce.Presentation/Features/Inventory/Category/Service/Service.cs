@@ -1,4 +1,7 @@
-﻿using eCommerce.Presentation.Features.Inventory.Categories.DaoService;
+﻿using System.Linq.Expressions;
+using eCommerce.Domain.Entities.Inventory;
+using eCommerce.Domain.Enums.Inventory.Categories;
+using eCommerce.Presentation.Features.Inventory.Categories.DaoService;
 using eCommerce.Presentation.Features.Inventory.Categories.Endpoints.V1.Create;
 using eCommerce.Presentation.Features.Inventory.Categories.Endpoints.V1.Delete;
 using eCommerce.Presentation.Features.Inventory.Categories.Endpoints.V1.Get;
@@ -26,6 +29,15 @@ public sealed class CategoryService : ICategoryService
     public Task<Response> GetAsync(GetCategoryRequest request, CancellationToken ct) =>
         _categoryDaoService.GetAsync(request, ct);
 
-    public Task<Response> GetAllAsync(GetAllCategoriesRequest request, CancellationToken ct) =>
-        _categoryDaoService.GetAllAsync(request, ct);
+    public Task<Response> GetAllAsync(GetAllCategoriesRequest request, CancellationToken ct)
+    {
+        Expression<Func<Category, object>> orderBy = request.OrderBy switch
+        {
+            CategoryOrderBy.Id => x => x.Id,
+            CategoryOrderBy.Name => x => x.Name,
+            CategoryOrderBy.CreatedOn => x => x.CreatedOn,
+            _ => (Category x) => x.CreatedOn
+        };
+        return _categoryDaoService.GetAllAsync(request, orderBy, ct);
+    }
 }
