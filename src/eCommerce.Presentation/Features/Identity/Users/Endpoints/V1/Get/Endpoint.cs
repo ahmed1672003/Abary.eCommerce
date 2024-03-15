@@ -7,6 +7,7 @@ public class GetUserEndpoint : Endpoint<GetUserRequest, Response>
 {
     public override void Configure()
     {
+        Version(1);
         Get($"{ModuleName.Identity}/{FeatureName.User}/{nameof(Get)}");
         Permissions(SystemConstants.Security.Identity.Users.Get);
     }

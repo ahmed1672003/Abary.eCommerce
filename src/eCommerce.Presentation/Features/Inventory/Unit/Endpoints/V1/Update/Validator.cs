@@ -35,11 +35,12 @@ internal sealed class UpdateUnitValidator : Validator<UpdateUnitRequest>
             .MustAsync(
                 async (req, ct) =>
                 {
-                    using var _context = Resolve<IeCommerceDbContext>();
+                    using (var _context = Resolve<IeCommerceDbContext>())
+                    {
+                        var _units = _context.Set<Unit>();
 
-                    var _units = _context.Set<Unit>();
-
-                    return await _units.AsNoTracking().AnyAsync(x => x.Id == req.Id);
+                        return await _units.AsNoTracking().AnyAsync(x => x.Id == req.Id);
+                    }
                 }
             )
             .WithMessage("الوحدة غير موجودة");
@@ -48,17 +49,19 @@ internal sealed class UpdateUnitValidator : Validator<UpdateUnitRequest>
             .MustAsync(
                 async (req, ct) =>
                 {
-                    using var _context = Resolve<IeCommerceDbContext>();
+                    using (var _context = Resolve<IeCommerceDbContext>())
+                    {
+                        var _units = _context.Set<Unit>();
 
-                    var _units = _context.Set<Unit>();
-
-                    return !await _units
-                        .AsNoTracking()
-                        .AnyAsync(
-                            x =>
-                                x.Name.ToLower().Equals(req.Name.ToLower()) && !x.Id.Equals(req.Id),
-                            ct
-                        );
+                        return !await _units
+                            .AsNoTracking()
+                            .AnyAsync(
+                                x =>
+                                    x.Name.ToLower().Equals(req.Name.ToLower())
+                                    && !x.Id.Equals(req.Id),
+                                ct
+                            );
+                    }
                 }
             )
             .WithMessage("يوجد لديك وحدة بهذا الاسم");

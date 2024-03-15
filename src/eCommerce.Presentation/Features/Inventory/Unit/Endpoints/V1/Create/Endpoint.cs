@@ -7,6 +7,7 @@ public sealed class CreateUnitEndpoint : Endpoint<CreateUnitRequest, Response>
 {
     public override void Configure()
     {
+        Version(1);
         Post($"{nameof(ModuleName.Inventory)}/{nameof(FeatureName.Unit)}/{CommandType.Create}");
         Permissions(SystemConstants.Security.Inventory.Units.Create);
     }

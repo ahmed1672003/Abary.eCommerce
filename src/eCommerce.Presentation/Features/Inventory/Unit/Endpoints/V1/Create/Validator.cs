@@ -32,11 +32,14 @@ internal sealed class CreatUnitValidator : Validator<CreateUnitRequest>
             .MustAsync(
                 async (req, ct) =>
                 {
-                    using var _context = Resolve<IeCommerceDbContext>();
+                    using (var _context = Resolve<IeCommerceDbContext>())
+                    {
+                        var _units = _context.Set<Unit>();
 
-                    var _units = _context.Set<Unit>();
-
-                    return !await _units.AnyAsync(x => x.Name.ToLower().Equals(req.Name.ToLower()));
+                        return !await _units.AnyAsync(x =>
+                            x.Name.ToLower().Equals(req.Name.ToLower())
+                        );
+                    }
                 }
             )
             .WithMessage("يوجد لديك وحدة بهذا الاسم");

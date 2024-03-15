@@ -16,11 +16,12 @@ internal sealed class DeleteUnitValidator : Validator<DeleteUnitRequest>
             .MustAsync(
                 async (req, ct) =>
                 {
-                    using var _context = Resolve<IeCommerceDbContext>();
+                    using (var _context = Resolve<IeCommerceDbContext>())
+                    {
+                        var _units = _context.Set<Unit>();
 
-                    var _units = _context.Set<Unit>();
-
-                    return await _units.AsNoTracking().AnyAsync(x => x.Id == req.Id);
+                        return await _units.AsNoTracking().AnyAsync(x => x.Id == req.Id);
+                    }
                 }
             )
             .WithMessage("الوحدة غير موجودة");
@@ -29,14 +30,15 @@ internal sealed class DeleteUnitValidator : Validator<DeleteUnitRequest>
             .MustAsync(
                 async (req, ct) =>
                 {
-                    using var _context = Resolve<IeCommerceDbContext>();
+                    using (var _context = Resolve<IeCommerceDbContext>())
+                    {
+                        var _units = _context.Set<Unit>();
 
-                    var _units = _context.Set<Unit>();
-
-                    return await _units
-                        .AsNoTracking()
-                        .Include(x => x.Products)
-                        .AnyAsync(x => x.Id == req.Id && !x.Products.Any());
+                        return await _units
+                            .AsNoTracking()
+                            .Include(x => x.Products)
+                            .AnyAsync(x => x.Id == req.Id && !x.Products.Any());
+                    }
                 }
             )
             .WithMessage("لايمكن حذف وحدة مرتبطة بمنتجات");

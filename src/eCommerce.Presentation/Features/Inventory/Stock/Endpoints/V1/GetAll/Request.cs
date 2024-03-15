@@ -1,3 +1,7 @@
-﻿namespace eCommerce.Presentation.Features.Inventory.Stock.Endpoints.V1.GetAll;
+﻿using eCommerce.Domain.Bases.Request;
+using eCommerce.Domain.Enums.Inventory.Stocks;
 
-public sealed class GetAllStocksRequest { }
+namespace eCommerce.Presentation.Features.Inventory.Stocks.Endpoints.V1.GetAll;
+
+public sealed record GetAllStocksRequest(StockOrderBy OrderBy = StockOrderBy.CreatedOn)
+    : PaginateRequest;

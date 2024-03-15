@@ -16,8 +16,6 @@
 
   <ItemGroup>
     <Folder Include="Features\Inventory\Product\" />
-    <Folder Include="Features\Inventory\Stock\Dto\" />
-    <Folder Include="Features\Inventory\Stock\Service\" />
   </ItemGroup>
 
 </Project>

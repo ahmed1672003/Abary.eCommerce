@@ -1,3 +1,27 @@
-﻿namespace eCommerce.Presentation.Features.Inventory.Stocks.Endpoints.V1.Get;
+﻿using eCommerce.Domain.Entities.Inventory;
 
-internal sealed class GetStockValidator { }
+namespace eCommerce.Presentation.Features.Inventory.Stocks.Endpoints.V1.Get;
+
+internal sealed class GetStockValidator : Validator<GetStockRequest>
+{
+    public GetStockValidator()
+    {
+        ClassLevelCascadeMode = CascadeMode.Stop;
+        RuleLevelCascadeMode = CascadeMode.Stop;
+
+        RuleFor(x => x)
+            .MustAsync(
+                async (req, ct) =>
+                {
+                    using (var context = Resolve<IeCommerceDbContext>())
+                    {
+                        return await context
+                            .Set<Stock>()
+                            .AsNoTracking()
+                            .AnyAsync(x => x.Id.Equals(req.Id), ct);
+                    }
+                }
+            )
+            .WithMessage("المخزن غير مسجل");
+    }
+}

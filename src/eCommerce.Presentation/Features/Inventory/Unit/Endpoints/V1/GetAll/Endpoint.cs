@@ -7,6 +7,7 @@ public sealed class GetAllUnitsEndpoint : Endpoint<GetAllUnitsRequest, Response>
 {
     public override void Configure()
     {
+        Version(1);
         Get($"{nameof(ModuleName.Inventory)}/{nameof(FeatureName.Unit)}/{nameof(GetAll)}");
         Permissions(SystemConstants.Security.Inventory.Units.GetAll);
     }

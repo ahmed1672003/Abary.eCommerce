@@ -6,6 +6,7 @@ public class AuthenticateUserEndpoint : Endpoint<AuthenticateUserRequest, Respon
 {
     public override void Configure()
     {
+        Version(1);
         Post($"{ModuleName.Identity}/{EntityName.User}/{nameof(Authenticate)}");
         AllowAnonymous();
     }

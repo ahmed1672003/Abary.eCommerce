@@ -6,6 +6,7 @@ public class ChangePasswordEndpoint : Endpoint<ChangePasswordRequest, Response>
 {
     public override void Configure()
     {
+        Version(1);
         Put($"{nameof(ModuleName.Identity)}/{nameof(FeatureName.User)}/{nameof(ChangePassword)}");
         Permissions();
     }

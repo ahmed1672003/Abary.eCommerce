@@ -88,7 +88,7 @@ public class CreateUserValidator : Validator<CreateUserRequest>
                     var users = Resolve<IeCommerceDbContext>().Set<User>();
 
                     return !await users.AnyAsync(
-                        x => x.NormalizedUserName == req.UserName.ToUpper(),
+                        x => x.NormalizedUserName.Equals(req.UserName.ToUpper()),
                         ct
                     );
                 }
