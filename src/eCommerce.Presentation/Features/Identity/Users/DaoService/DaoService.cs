@@ -400,6 +400,7 @@ public sealed class UserDaoService : IUserDaoService
             if (request.IsDeleted)
             {
                 query = query.IgnoreQueryFilters().Where(x => x.IsDeleted);
+                totalCount = await query.CountAsync(ct);
             }
 
             if (!string.IsNullOrEmpty(request.Search))

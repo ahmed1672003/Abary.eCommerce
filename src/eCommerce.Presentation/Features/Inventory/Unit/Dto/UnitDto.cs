@@ -1,10 +1,9 @@
-﻿namespace eCommerce.Presentation.Features.Inventory.Units.Dto;
+﻿using eCommerce.Domain.Bases.Dto;
 
-public sealed class UnitDto
+namespace eCommerce.Presentation.Features.Inventory.Units.Dto;
+
+public sealed record UnitDto : BaseDto<Guid>
 {
-    public Guid Id { get; set; }
-
     public string Name { get; set; }
     public string? Description { get; set; }
-    public DateTime CreatedOn { get; set; }
 }

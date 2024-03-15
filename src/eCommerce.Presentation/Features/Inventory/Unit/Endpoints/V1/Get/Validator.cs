@@ -16,11 +16,12 @@ internal sealed class GetUnitValidator : Validator<GetUnitRequest>
             .MustAsync(
                 async (req, ct) =>
                 {
-                    using var _context = Resolve<IeCommerceDbContext>();
+                    using (var _context = Resolve<IeCommerceDbContext>())
+                    {
+                        var _units = _context.Set<Unit>();
 
-                    var _units = _context.Set<Unit>();
-
-                    return await _units.AsNoTracking().AnyAsync(x => x.Id == req.Id);
+                        return await _units.AsNoTracking().AnyAsync(x => x.Id == req.Id);
+                    }
                 }
             )
             .WithMessage("الوحدة غير موجودة");

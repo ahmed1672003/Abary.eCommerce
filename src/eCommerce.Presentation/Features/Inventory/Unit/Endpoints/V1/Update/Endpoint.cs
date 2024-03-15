@@ -8,6 +8,7 @@ public sealed class UpdateUnitEndpoint : Endpoint<UpdateUnitRequest, Response>
 {
     public override void Configure()
     {
+        Version(1);
         Put($"{nameof(ModuleName.Inventory)}/{nameof(FeatureName.Unit)}/{nameof(Update)}");
         Permissions(SystemConstants.Security.Inventory.Units.Update);
     }

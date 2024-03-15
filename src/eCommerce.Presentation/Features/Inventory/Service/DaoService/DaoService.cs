@@ -187,6 +187,7 @@ public sealed class ServiceDaoService : IServiceDaoService
             if (request.IsDeleted)
             {
                 query = query.IgnoreQueryFilters().Where(x => x.IsDeleted);
+                totalCount = await query.CountAsync(ct);
             }
 
             if (!string.IsNullOrEmpty(request.Search))

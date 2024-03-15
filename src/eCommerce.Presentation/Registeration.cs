@@ -4,6 +4,8 @@ using eCommerce.Presentation.Features.Identity.Users.DaoService;
 using eCommerce.Presentation.Features.Identity.Users.Service;
 using eCommerce.Presentation.Features.Inventory.Services.DaoService;
 using eCommerce.Presentation.Features.Inventory.Services.Services;
+using eCommerce.Presentation.Features.Inventory.Stocks.DaoService;
+using eCommerce.Presentation.Features.Inventory.Stocks.Service;
 using eCommerce.Presentation.Features.Inventory.Units.DaoService;
 using eCommerce.Presentation.Features.Inventory.Units.Service;
 using eCommerce.Presentation.Json.Service;
@@ -17,27 +19,28 @@ public static class Registeration
     public static IServiceCollection RegisterPresentation(this IServiceCollection services)
     {
         services.AddHttpContextAccessor();
+
         // Mapper
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
-
-        // Fluent Validation
 
         // DaoService
         services.AddTransient<IUserDaoService, UserDaoService>();
         services.AddTransient<IUnitDaoService, UnitDaoService>();
         services.AddTransient<IServiceDaoService, ServiceDaoService>();
+        services.AddTransient<IStockDaoService, StockDaoService>();
 
         // Service
-        services
-            .AddTransient<IUserService, UserService>()
-            .AddTransient<IUnitService, UnitService>()
-            .AddTransient<IServiceService, ServiceService>()
-            .AddTransient<IJwtService, JwtService>()
-            .AddTransient<UserManager<User>>()
-            .AddTransient<RoleManager<Role>>()
-            .AddTransient<SignInManager<User>>()
-            .AddTransient<IJsonService, JsonService>();
+        services.AddTransient<IUserService, UserService>();
+        services.AddTransient<IUnitService, UnitService>();
+        services.AddTransient<IServiceService, ServiceService>();
+        services.AddTransient<IStockService, StockService>();
+        services.AddTransient<IJwtService, JwtService>();
+        services.AddTransient<UserManager<User>>();
+        services.AddTransient<RoleManager<Role>>();
+        services.AddTransient<SignInManager<User>>();
+        services.AddTransient<IJsonService, JsonService>();
 
+        // Middle wares
         services.AddScoped<TokenMiddleware>();
         services.AddScoped<ExceptionMiddleware>();
 

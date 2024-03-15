@@ -6,6 +6,7 @@ public class RegisterUserEndpoint : Endpoint<RegisterUserRequest, Response>
 {
     public override void Configure()
     {
+        Version(1);
         Post($"{ModuleName.Identity}/{EntityName.User}/{nameof(Register)}");
         AllowAnonymous();
     }

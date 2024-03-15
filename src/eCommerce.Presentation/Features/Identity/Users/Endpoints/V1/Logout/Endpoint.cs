@@ -6,6 +6,7 @@ public class LogoutUserEndpoint : EndpointWithoutRequest<Response>
 {
     public override void Configure()
     {
+        Version(1);
         Get($"{nameof(ModuleName.Identity)}/{nameof(FeatureName.User)}/{nameof(Logout)}");
         Permissions();
     }

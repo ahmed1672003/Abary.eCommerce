@@ -7,6 +7,7 @@ internal sealed class UpdateUserEndpoint : Endpoint<UpdateUserRequest, Response>
 {
     public override void Configure()
     {
+        Version(1);
         Put($"{nameof(ModuleName.Identity)}/{nameof(FeatureName.User)}/{nameof(Update)}");
         Permissions(SystemConstants.Security.Identity.Users.Update + "UnderDevelopment");
     }

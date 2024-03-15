@@ -7,6 +7,7 @@ public sealed class DeleteUnitEndpoint : Endpoint<DeleteUnitRequest, Response>
 {
     public override void Configure()
     {
+        Version(1);
         Delete($"{nameof(ModuleName.Inventory)}/{nameof(FeatureName.Unit)}/{nameof(Delete)}");
         Permissions(SystemConstants.Security.Inventory.Units.Delete);
     }
