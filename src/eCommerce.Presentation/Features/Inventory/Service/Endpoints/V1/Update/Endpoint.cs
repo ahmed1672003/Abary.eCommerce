@@ -8,6 +8,7 @@ internal sealed class UpdateServiceEndpoint : Endpoint<UpdateServiceRequest, Res
 {
     public override void Configure()
     {
+        Version(1);
         Put($"{nameof(ModuleName.Inventory)}/{nameof(FeatureName.Service)}/{nameof(Update)}");
         Permissions(SystemConstants.Security.Inventory.Services.Update);
     }

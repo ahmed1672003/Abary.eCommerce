@@ -7,6 +7,7 @@ internal sealed class CreateServiceEndpoint : Endpoint<CreateServiceRequest, Res
 {
     public override void Configure()
     {
+        Version(1);
         Post($"{nameof(ModuleName.Inventory)}/{nameof(FeatureName.Service)}/{nameof(Create)}");
         Permissions(SystemConstants.Security.Inventory.Services.Create);
     }

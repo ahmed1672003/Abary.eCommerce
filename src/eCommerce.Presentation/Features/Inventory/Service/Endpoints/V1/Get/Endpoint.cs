@@ -7,6 +7,7 @@ internal sealed class GetServiceEndpoint : Endpoint<GetServiceRequest, Response>
 {
     public override void Configure()
     {
+        Version(1);
         Get($"{nameof(ModuleName.Inventory)}/{nameof(FeatureName.Service)}/{nameof(Get)}");
         Permissions(SystemConstants.Security.Inventory.Services.Get);
     }
