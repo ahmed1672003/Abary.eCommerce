@@ -41,6 +41,7 @@ public sealed class ExceptionMiddleware : IMiddleware
                 => StatusCodes.Status400BadRequest,
             FluentValidation.ValidationException => StatusCodes.Status400BadRequest,
             FastEndpoints.ValidationFailureException => StatusCodes.Status400BadRequest,
+            DbUpdateException => StatusCodes.Status400BadRequest,
             BadRequestException => StatusCodes.Status400BadRequest,
             NotFoundException => StatusCodes.Status404NotFound,
             DatabaseConflictException => StatusCodes.Status409Conflict,
