@@ -2,4 +2,8 @@
 
 namespace eCommerce.Presentation.Features.Inventory.Categories.Dto;
 
-internal record CategoryDto : BaseDto<Guid> { }
+public record CategoryDto : BaseDto<Guid>
+{
+    public string Name { get; set; }
+    public string? Description { get; set; }
+}
