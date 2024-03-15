@@ -30,7 +30,7 @@ internal sealed class DeleteCategoryValidator : Validator<DeleteCategoryRequest>
                 {
                     using (var context = Resolve<IeCommerceDbContext>())
                     {
-                        return await context
+                        return !await context
                             .Set<Category>()
                             .AsNoTracking()
                             .Include(x => x.ProductCategories)
