@@ -8,7 +8,6 @@ internal sealed class StockConfig : IEntityTypeConfiguration<Stock>
     {
         builder.ToTable(nameof(EntityName.Stock), nameof(ModuleName.Inventory));
         builder.HasKey(x => x.Id);
-        builder.HasIndex(x => x.Name).IsUnique(true);
         builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }

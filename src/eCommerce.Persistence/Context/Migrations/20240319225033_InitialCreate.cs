@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace eCommerce.Persistence.Context.Migrations
 {
     /// <inheritdoc />
-    public partial class InitCreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -312,11 +312,11 @@ namespace eCommerce.Persistence.Context.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    AddressId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    AddressId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -780,20 +780,6 @@ namespace eCommerce.Persistence.Context.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Category_Name",
-                schema: "Inventory",
-                table: "Category",
-                column: "Name",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Feature_Name",
-                schema: "Inventory",
-                table: "Feature",
-                column: "Name",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Item_InvoiceId",
                 schema: "Inventory",
                 table: "Item",
@@ -836,13 +822,6 @@ namespace eCommerce.Persistence.Context.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Service_Name",
-                schema: "Inventory",
-                table: "Service",
-                column: "Name",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Stock_AddressId",
                 schema: "Inventory",
                 table: "Stock",
@@ -853,13 +832,6 @@ namespace eCommerce.Persistence.Context.Migrations
                 schema: "Inventory",
                 table: "StockProduct",
                 column: "StockId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Unit_Name",
-                schema: "Inventory",
-                table: "Unit",
-                column: "Name",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_Email",

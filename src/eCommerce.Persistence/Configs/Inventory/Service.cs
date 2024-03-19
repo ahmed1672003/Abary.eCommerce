@@ -8,7 +8,6 @@ internal sealed class ServiceConfig : IEntityTypeConfiguration<Service>
     {
         builder.ToTable(nameof(EntityName.Service), nameof(ModuleName.Inventory));
         builder.HasKey(x => x.Id);
-        builder.HasIndex(x => x.Name).IsUnique(true);
         builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }

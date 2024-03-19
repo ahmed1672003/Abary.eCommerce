@@ -552,9 +552,6 @@ namespace eCommerce.Persistence.Context.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
                     b.ToTable("Category", "Inventory");
                 });
 
@@ -597,9 +594,6 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("Feature", "Inventory");
                 });
@@ -898,9 +892,6 @@ namespace eCommerce.Persistence.Context.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
                     b.ToTable("Service", "Inventory");
                 });
 
@@ -1022,9 +1013,6 @@ namespace eCommerce.Persistence.Context.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("Unit", "Inventory");
                 });
