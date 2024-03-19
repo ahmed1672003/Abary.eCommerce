@@ -56,9 +56,7 @@ internal sealed class UpdateUnitValidator : Validator<UpdateUnitRequest>
                         return !await _units
                             .AsNoTracking()
                             .AnyAsync(
-                                x =>
-                                    x.Name.ToLower().Equals(req.Name.ToLower())
-                                    && !x.Id.Equals(req.Id),
+                                x => x.Name.ToLower() == req.Name.ToLower() && x.Id != req.Id,
                                 ct
                             );
                     }

@@ -39,7 +39,7 @@ internal sealed class UpdateStockValidator : Validator<UpdateStockRequest>
                         return await context
                             .Set<Stock>()
                             .AsNoTracking()
-                            .AnyAsync(x => x.Id.Equals(req.Id), ct);
+                            .AnyAsync(x => x.Id == req.Id, ct);
                     }
                 }
             )
@@ -55,9 +55,7 @@ internal sealed class UpdateStockValidator : Validator<UpdateStockRequest>
                             .Set<Stock>()
                             .AsNoTracking()
                             .AnyAsync(
-                                x =>
-                                    x.Name.ToLower().Equals(req.Name.ToLower())
-                                    && !x.Id.Equals(req.Id),
+                                x => x.Name.ToLower() == req.Name.ToLower() && x.Id != req.Id,
                                 ct
                             );
                     }

@@ -1,8 +1,5 @@
-﻿using System.Linq.Expressions;
-using AutoMapper;
+﻿using System.Data;
 using eCommerce.Domain.Entities.Inventory;
-using eCommerce.Domain.Exceptions;
-using eCommerce.Presentation.Extensions;
 using eCommerce.Presentation.Features.Inventory.Services.Dto;
 using eCommerce.Presentation.Features.Inventory.Services.Endpoints.V1.Create;
 using eCommerce.Presentation.Features.Inventory.Services.Endpoints.V1.Delete;
@@ -43,65 +40,134 @@ public sealed class ServiceDaoService : IServiceDaoService
 
     public async Task<Response> CreateAsync(CreateServiceRequest request, CancellationToken ct)
     {
-        using var transaction = await _context.BeginTransactionAsync(ct);
-        try
+        using (var transaction = await _context.BeginTransactionAsync(ct))
         {
-            var modifiedRows = 0;
-
-            var service = _mapper.Map<Service>(request);
-
-            modifiedRows++;
-            var entry = await _services.AddAsync(service);
-            service = entry.Entity;
-
-            var success = await _context.IsDoneAsync(modifiedRows, ct);
-
-            if (success)
+            try
             {
-                await transaction.CommitAsync(ct);
+                var modifiedRows = 0;
 
-                var result = _mapper.Map<ServiceDto>(service);
+                var service = _mapper.Map<Service>(request);
 
-                return new Response<ServiceDto>
+                modifiedRows++;
+                var entry = await _services.AddAsync(service);
+                service = entry.Entity;
+
+                var success = await _context.IsDoneAsync(modifiedRows, ct);
+
+                if (success)
                 {
-                    IsSuccess = true,
-                    Message = _success,
-                    Result = result
-                };
-            }
+                    await transaction.CommitAsync(ct);
 
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+                    var result = _mapper.Map<ServiceDto>(service);
+
+                    return new Response<ServiceDto>
+                    {
+                        IsSuccess = true,
+                        Message = _success,
+                        Result = result
+                    };
+                }
+
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+            }
         }
     }
 
     public async Task<Response> UpdateAsync(UpdateServiceRequest request, CancellationToken ct)
     {
-        var transaction = await _context.BeginTransactionAsync(ct);
-        try
+        using (var transaction = await _context.BeginTransactionAsync(IsolationLevel.Snapshot, ct))
         {
-            var modifiedRows = 0;
-
-            var service = await _services.AsNoTracking().FirstAsync(x => x.Id == request.Id);
-
-            _mapper.Map(request, service);
-
-            modifiedRows++;
-            var entry = _services.Update(service);
-
-            var success = await _context.IsDoneAsync(modifiedRows, ct);
-
-            if (success)
+            try
             {
-                await transaction.CommitAsync(ct);
+                var modifiedRows = 0;
+                var service = await _services.AsNoTracking().FirstAsync(x => x.Id == request.Id);
+
+                _mapper.Map(request, service);
+
+                modifiedRows++;
+                var entry = _services.Update(service);
+
+                var success = await _context.IsDoneAsync(modifiedRows, ct);
+
+                if (success)
+                {
+                    await transaction.CommitAsync(ct);
+
+                    var result = _mapper.Map<ServiceDto>(service);
+
+                    return new Response<ServiceDto>
+                    {
+                        IsSuccess = true,
+                        Message = _success,
+                        Result = result
+                    };
+                }
+
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+            }
+        }
+    }
+
+    public async Task<Response> DeleteAsync(DeleteServiceRequest request, CancellationToken ct)
+    {
+        using (
+            var transaction = await _context.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct)
+        )
+        {
+            try
+            {
+                var modifiedRows = 0;
+
+                var service = await _services.AsNoTracking().FirstAsync(x => x.Id == request.Id);
+
+                modifiedRows++;
+                _services.Remove(service);
+
+                var success = await _context.IsDoneAsync(modifiedRows, ct);
+
+                if (success)
+                {
+                    await transaction.CommitAsync(ct);
+
+                    return new Response { IsSuccess = true, Message = _success, };
+                }
+
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+            }
+        }
+    }
+
+    public async Task<Response> GetAsync(GetServiceRequest reqyuest, CancellationToken ct)
+    {
+        using (
+            var transaction = await _context.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct)
+        )
+        {
+            try
+            {
+                var service = await _services.AsNoTracking().FirstAsync(x => x.Id == reqyuest.Id);
 
                 var result = _mapper.Map<ServiceDto>(service);
 
+                await transaction.CommitAsync(ct);
                 return new Response<ServiceDto>
                 {
                     IsSuccess = true,
@@ -109,66 +175,11 @@ public sealed class ServiceDaoService : IServiceDaoService
                     Result = result
                 };
             }
-
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
-        }
-    }
-
-    public async Task<Response> DeleteAsync(DeleteServiceRequest request, CancellationToken ct)
-    {
-        using var transaction = await _context.BeginTransactionAsync(ct);
-        try
-        {
-            var modifiedRows = 0;
-
-            var service = await _services.AsNoTracking().FirstAsync(x => x.Id == request.Id);
-
-            modifiedRows++;
-            _services.Remove(service);
-
-            var success = await _context.IsDoneAsync(modifiedRows, ct);
-
-            if (success)
+            catch (Exception ex)
             {
-                await transaction.CommitAsync(ct);
-
-                return new Response { IsSuccess = true, Message = _success, };
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseExecuteQueryException(ex.Message, ex.InnerException);
             }
-
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
-        }
-    }
-
-    public async Task<Response> GetAsync(GetServiceRequest reqyuest, CancellationToken ct)
-    {
-        try
-        {
-            var service = await _services.AsNoTracking().FirstAsync(x => x.Id == reqyuest.Id);
-
-            var result = _mapper.Map<ServiceDto>(service);
-
-            return new Response<ServiceDto>
-            {
-                IsSuccess = true,
-                Message = _success,
-                Result = result
-            };
-        }
-        catch (Exception ex)
-        {
-            throw new DatabaseExecuteQueryException(ex.Message, ex.InnerException);
         }
     }
 
@@ -178,43 +189,50 @@ public sealed class ServiceDaoService : IServiceDaoService
         CancellationToken ct
     )
     {
-        try
+        using (
+            var transaction = await _context.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct)
+        )
         {
-            var query = _services.AsNoTracking();
-            var totalCount = await query.CountAsync(ct);
-            query = query.Paginate(request, orderBy);
-
-            if (request.IsDeleted)
+            try
             {
-                query = query.IgnoreQueryFilters().Where(x => x.IsDeleted);
-                totalCount = await query.CountAsync(ct);
+                var query = _services.AsNoTracking();
+                var totalCount = await query.CountAsync(ct);
+                query = query.Paginate(request, orderBy);
+
+                if (request.IsDeleted)
+                {
+                    query = query.IgnoreQueryFilters().Where(x => x.IsDeleted);
+                    totalCount = await query.CountAsync(ct);
+                }
+
+                if (!string.IsNullOrEmpty(request.Search))
+                {
+                    query = query.Where(x =>
+                        x.Name.ToLower().Contains(request.Search)
+                        || x.Price.ToString().Contains(request.Search)
+                        || x.Description.ToLower().Contains(request.Search)
+                    );
+                }
+
+                var result = _mapper.Map<IEnumerable<ServiceDto>>(query);
+
+                await transaction.CommitAsync(ct);
+                return new PaginationResponse<IEnumerable<ServiceDto>>
+                {
+                    IsSuccess = true,
+                    Message = _success,
+                    Count = result.Count(),
+                    PageNumber = request.Page,
+                    PageSize = request.Size,
+                    TotalCount = totalCount,
+                    Result = result
+                };
             }
-
-            if (!string.IsNullOrEmpty(request.Search))
+            catch (Exception ex)
             {
-                query = query.Where(x =>
-                    x.Name.ToLower().Contains(request.Search)
-                    || x.Price.ToString().Contains(request.Search)
-                    || x.Description.ToLower().Contains(request.Search)
-                );
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseExecuteQueryException(ex.Message, ex.InnerException);
             }
-
-            var result = _mapper.Map<IEnumerable<ServiceDto>>(query);
-
-            return new PaginationResponse<IEnumerable<ServiceDto>>
-            {
-                IsSuccess = true,
-                Message = _success,
-                Count = result.Count(),
-                PageNumber = request.Page,
-                PageSize = request.Size,
-                TotalCount = totalCount,
-                Result = result
-            };
-        }
-        catch (Exception ex)
-        {
-            throw new DatabaseExecuteQueryException(ex.Message, ex.InnerException);
         }
     }
 }

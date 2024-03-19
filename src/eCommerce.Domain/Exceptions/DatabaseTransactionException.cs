@@ -3,15 +3,13 @@
 public sealed class DatabaseTransactionException : Exception
 {
     public DatabaseTransactionException()
-        : base("Database Transaction Does Not Completed Exception") { }
+        : base("Transaction Does Not Completed Exception") { }
 
-    public DatabaseTransactionException(
-        string message = "Database Transaction Does Not Completed Exception"
-    )
+    public DatabaseTransactionException(string message = "Transaction Does Not Completed")
         : base(message) { }
 
     public DatabaseTransactionException(
-        string message = "Database Transaction Does Not Completed Exception",
+        string message = "Transaction Does Not Completed",
         Exception innerException = null
     )
         : base(message, innerException) { }

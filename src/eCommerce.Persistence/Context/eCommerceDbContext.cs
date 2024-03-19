@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Data;
+using System.Reflection;
 
 namespace eCommerce.Persistence.Context;
 
@@ -24,4 +25,11 @@ public sealed class eCommerceDbContext
 
     public Task<bool> EnsureCreatedAsync(CancellationToken ct = default) =>
         this.Database.EnsureCreatedAsync(ct);
+
+    public Task<IDbContextTransaction> BeginTransactionAsync(
+        IsolationLevel isolationLevel,
+        CancellationToken ct
+    ) => Database.BeginTransactionAsync(isolationLevel, ct);
+
+    public DbContext Context => this;
 }

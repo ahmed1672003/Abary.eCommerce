@@ -1,4 +1,4 @@
-﻿using eCommerce.Domain.Constants;
+﻿using eCommerce.Domain.Enums;
 using eCommerce.Presentation.Features.Inventory.Units.Service;
 
 namespace eCommerce.Presentation.Features.Inventory.Units.Endpoints.V1.Create;

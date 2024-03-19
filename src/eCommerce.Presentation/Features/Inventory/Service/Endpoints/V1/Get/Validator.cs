@@ -8,14 +8,16 @@ internal sealed class GetServiceValidator : Validator<GetServiceRequest>
     {
         ClassLevelCascadeMode = CascadeMode.Stop;
         RuleLevelCascadeMode = CascadeMode.Stop;
-        using var _context = Resolve<IeCommerceDbContext>();
-        var _services = _context.Set<Service>();
 
         RuleFor(x => x)
             .MustAsync(
                 async (req, ct) =>
                 {
-                    return await _services.AsNoTracking().AnyAsync(x => x.Id.Equals(req.Id), ct);
+                    using (var _context = Resolve<IeCommerceDbContext>())
+                    {
+                        var _services = _context.Set<Service>();
+                        return await _services.AsNoTracking().AnyAsync(x => x.Id == req.Id, ct);
+                    }
                 }
             )
             .WithMessage("الخدمة غير موجودة");

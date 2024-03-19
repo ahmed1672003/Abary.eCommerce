@@ -39,7 +39,7 @@ internal sealed class CreateStockValidator : Validator<CreateStockRequest>
                         return !await context
                             .Set<Stock>()
                             .AsNoTracking()
-                            .AnyAsync(x => x.Name.ToLower().Equals(req.Name.ToLower()), ct);
+                            .AnyAsync(x => x.Name.ToLower() == req.Name.ToLower(), ct);
                     }
                 }
             )

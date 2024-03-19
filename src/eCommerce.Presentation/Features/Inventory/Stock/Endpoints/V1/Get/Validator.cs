@@ -18,7 +18,7 @@ internal sealed class GetStockValidator : Validator<GetStockRequest>
                         return await context
                             .Set<Stock>()
                             .AsNoTracking()
-                            .AnyAsync(x => x.Id.Equals(req.Id), ct);
+                            .AnyAsync(x => x.Id == req.Id, ct);
                     }
                 }
             )

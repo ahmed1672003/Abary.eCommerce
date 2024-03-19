@@ -1,8 +1,4 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-
-namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.ChangePassword;
+﻿namespace eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.ChangePassword;
 
 public class ChangePasswordValidator : Validator<ChangePasswordRequest>
 {
@@ -33,20 +29,11 @@ public class ChangePasswordValidator : Validator<ChangePasswordRequest>
             .NotEqual(x => x.NewPassword)
             .WithMessage("لايمكن التغيير بكلمة المرور القديمة");
 
+        RuleFor(x => x).Must(IsPasswordValid).WithMessage("كلمة المرور الجديدة غير صالحة");
+
         RuleFor(x => x.NewPassword)
             .Matches(x => x.ConfirmNewPassword)
             .WithMessage("كلمتا المرور غير متطابقتان");
-
-        RuleFor(x => x.NewPassword)
-            .Must(
-                (password) =>
-                {
-                    return password.Count(x => char.IsUpper(x)) >= 1
-                        && password.Count(x => char.IsLower(x)) >= 1
-                        && password.Count(x => char.IsNumber(x)) >= 1;
-                }
-            )
-            .WithMessage("كلمة المرور الجديدة غير صالحة");
 
         RuleFor(x => x)
             .MustAsync(
@@ -66,5 +53,13 @@ public class ChangePasswordValidator : Validator<ChangePasswordRequest>
                 }
             )
             .WithMessage("كلمة المرور خاطئة");
+
+        bool IsPasswordValid(ChangePasswordRequest request)
+        {
+            return request.NewPassword.Count(x => char.IsNumber(x)) >= 1
+                && request.NewPassword.Count(x => char.IsUpper(x)) >= 1
+                //&& request.Password.Count(x => char.IsSymbol(x)) >= 1
+                && request.NewPassword.Count(x => char.IsLower(x)) >= 1;
+        }
     }
 }

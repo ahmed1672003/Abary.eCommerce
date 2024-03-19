@@ -23,8 +23,15 @@ public static class SystemConstants
             private const string DATABASE_PASSWORD = "Ahmed#01280755031";
             private const string DATABASE_SSL_MODE = "prefer";
             private const string DATABASE_TIME_OUT = "30";
+
             public const string LOCALHOST_DATABASE_CONNECTION_STRING =
-                $"host={DATABASE_HOST};port={DATABASE_PORT};Database={DATABASE_NAME};User Id={DATABASE_USER_ID};password={DATABASE_PASSWORD};sslmode={DATABASE_SSL_MODE};timeout={DATABASE_TIME_OUT}";
+                $"host={DATABASE_HOST};"
+                + $"port={DATABASE_PORT};"
+                + $"Database={DATABASE_NAME};"
+                + $"User Id={DATABASE_USER_ID};"
+                + $"password={DATABASE_PASSWORD};"
+                + $"sslmode={DATABASE_SSL_MODE};"
+                + $"timeout={DATABASE_TIME_OUT};";
         }
 
         public static class Cloud
@@ -35,7 +42,10 @@ public static class SystemConstants
             private const string PGPASSWORD = "zwD9olO5bHCj";
 
             public const string CLOUD_DATABASE_CONNECTION_STRING =
-                $"host={PGHOST};Database={PGDATABASE};User ID={PGUSER};password={PGPASSWORD}";
+                $"host={PGHOST};"
+                + $"Database={PGDATABASE};"
+                + $"User ID={PGUSER};"
+                + $"password={PGPASSWORD}";
         }
 
         public static void SetEnvironmentVariables()

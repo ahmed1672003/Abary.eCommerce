@@ -1,8 +1,5 @@
-﻿using System.Linq.Expressions;
-using AutoMapper;
+﻿using System.Data;
 using eCommerce.Domain.Entities.Inventory;
-using eCommerce.Domain.Exceptions;
-using eCommerce.Presentation.Extensions;
 using eCommerce.Presentation.Features.Inventory.Categories.Dto;
 using eCommerce.Presentation.Features.Inventory.Categories.Endpoints.V1.Create;
 using eCommerce.Presentation.Features.Inventory.Categories.Endpoints.V1.Delete;
@@ -39,62 +36,133 @@ public sealed class CategoryDaoService : ICategoryDaoService
 
     public async Task<Response> CreateAsync(CreateCategoryRequest request, CancellationToken ct)
     {
-        using var transaction = await _context.BeginTransactionAsync(ct);
-        try
+        using (var transaction = await _context.BeginTransactionAsync(ct))
         {
-            var modifiedRows = 0;
-
-            var category = _mapper.Map<Category>(request);
-
-            modifiedRows++;
-            var entry = await _categories.AddAsync(category, ct);
-
-            var success = await _context.IsDoneAsync(modifiedRows, ct);
-
-            if (success)
+            try
             {
-                await transaction.CommitAsync(ct);
-                var result = _mapper.Map<CategoryDto>(entry.Entity);
-                return new Response<CategoryDto>
-                {
-                    IsSuccess = true,
-                    Message = _success,
-                    Result = result
-                };
-            }
+                var modifiedRows = 0;
 
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+                var category = _mapper.Map<Category>(request);
+
+                modifiedRows++;
+                var entry = await _categories.AddAsync(category, ct);
+
+                var success = await _context.IsDoneAsync(modifiedRows, ct);
+
+                if (success)
+                {
+                    await transaction.CommitAsync(ct);
+                    var result = _mapper.Map<CategoryDto>(entry.Entity);
+                    return new Response<CategoryDto>
+                    {
+                        IsSuccess = true,
+                        Message = _success,
+                        Result = result
+                    };
+                }
+
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+            }
         }
     }
 
     public async Task<Response> UpdateAsync(UpdateCategoryRequest request, CancellationToken ct)
     {
-        using var transaction = await _context.BeginTransactionAsync(ct);
-        try
+        using (var transaction = await _context.BeginTransactionAsync(IsolationLevel.Snapshot, ct))
         {
-            var modifiedRows = 0;
-            var category = await _categories
-                .AsNoTracking()
-                .FirstAsync(x => x.Id.Equals(request.Id));
-            _mapper.Map(request, category);
-
-            modifiedRows++;
-            var entry = _categories.Update(category);
-
-            var success = await _context.IsDoneAsync(modifiedRows, ct);
-
-            if (success)
+            try
             {
+                var modifiedRows = 0;
+                var category = await _categories
+                    .AsNoTracking()
+                    .FirstAsync(x => x.Id.Equals(request.Id));
+                _mapper.Map(request, category);
+
+                modifiedRows++;
+                var entry = _categories.Update(category);
+
+                var success = await _context.IsDoneAsync(modifiedRows, ct);
+
+                await Task.Delay(2000);
+                if (success)
+                {
+                    await transaction.CommitAsync(ct);
+
+                    Console.WriteLine(category.Name);
+                    var result = _mapper.Map<CategoryDto>(entry.Entity);
+
+                    return new Response<CategoryDto>
+                    {
+                        IsSuccess = true,
+                        Message = _success,
+                        Result = result
+                    };
+                }
+
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+            }
+        }
+    }
+
+    public async Task<Response> DeleteAsync(DeleteCategoryRequest request, CancellationToken ct)
+    {
+        using (var transaction = await _context.BeginTransactionAsync(IsolationLevel.Snapshot, ct))
+        {
+            try
+            {
+                var modifiedRows = 0;
+                var category = await _categories
+                    .AsNoTracking()
+                    .FirstAsync(x => x.Id.Equals(request.Id));
+
+                modifiedRows++;
+                _categories.Remove(category);
+
+                var success = await _context.IsDoneAsync(modifiedRows, ct);
+
+                if (success)
+                {
+                    await transaction.CommitAsync(ct);
+                    return new Response { IsSuccess = false, Message = _success, };
+                }
+
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+            }
+        }
+    }
+
+    public async Task<Response> GetAsync(GetCategoryRequest request, CancellationToken ct)
+    {
+        using (
+            var transaction = await _context.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct)
+        )
+        {
+            try
+            {
+                var category = await _categories
+                    .AsNoTracking()
+                    .FirstAsync(x => x.Id.Equals(request.Id));
+                var result = _mapper.Map<CategoryDto>(category);
+
                 await transaction.CommitAsync(ct);
-
-                var result = _mapper.Map<CategoryDto>(entry.Entity);
-
                 return new Response<CategoryDto>
                 {
                     IsSuccess = true,
@@ -102,67 +170,11 @@ public sealed class CategoryDaoService : ICategoryDaoService
                     Result = result
                 };
             }
-
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
-        }
-    }
-
-    public async Task<Response> DeleteAsync(DeleteCategoryRequest request, CancellationToken ct)
-    {
-        using var transaction = await _context.BeginTransactionAsync(ct);
-        try
-        {
-            var modifiedRows = 0;
-            var category = await _categories
-                .AsNoTracking()
-                .FirstAsync(x => x.Id.Equals(request.Id));
-
-            modifiedRows++;
-            _categories.Remove(category);
-
-            var success = await _context.IsDoneAsync(modifiedRows, ct);
-
-            if (success)
+            catch (Exception ex)
             {
-                await transaction.CommitAsync(ct);
-                return new Response { IsSuccess = false, Message = _success, };
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseExecuteQueryException(ex.Message, ex.InnerException);
             }
-
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
-        }
-    }
-
-    public async Task<Response> GetAsync(GetCategoryRequest request, CancellationToken ct)
-    {
-        try
-        {
-            var category = await _categories
-                .AsNoTracking()
-                .FirstAsync(x => x.Id.Equals(request.Id));
-            var result = _mapper.Map<CategoryDto>(category);
-
-            return new Response<CategoryDto>
-            {
-                IsSuccess = true,
-                Message = _success,
-                Result = result
-            };
-        }
-        catch (Exception ex)
-        {
-            throw new DatabaseExecuteQueryException(ex.Message, ex.InnerException);
         }
     }
 
@@ -172,42 +184,50 @@ public sealed class CategoryDaoService : ICategoryDaoService
         CancellationToken ct
     )
     {
-        try
+        using (
+            var transaction = await _context.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct)
+        )
         {
-            var query = _categories.AsNoTracking();
-            var totalCount = await query.CountAsync(ct);
-            query = query.Paginate(request, orderBy);
-
-            if (request.IsDeleted)
+            try
             {
-                query = query.IgnoreQueryFilters().Where(x => x.IsDeleted);
-                totalCount = await query.CountAsync(ct);
+                var query = _categories.AsNoTracking();
+                var totalCount = await query.CountAsync(ct);
+                query = query.Paginate(request, orderBy);
+
+                if (request.IsDeleted)
+                {
+                    query = query.IgnoreQueryFilters().Where(x => x.IsDeleted);
+                    totalCount = await query.CountAsync(ct);
+                }
+
+                if (!string.IsNullOrEmpty(request.Search))
+                {
+                    query = query.Where(x =>
+                        x.Name.ToLower().Contains(request.Search)
+                        || x.CreatedOn.ToString().Contains(request.Search)
+                    );
+                }
+
+                var result = _mapper.Map<IEnumerable<CategoryDto>>(query);
+
+                await transaction.CommitAsync(ct);
+                return new PaginationResponse<IEnumerable<CategoryDto>>
+                {
+                    IsSuccess = true,
+                    Message = _success,
+                    Count = result.Count(),
+                    PageNumber = request.Page,
+                    PageSize = request.Size,
+                    TotalCount = totalCount,
+                    Result = result
+                };
             }
-
-            if (!string.IsNullOrEmpty(request.Search))
+            catch (Exception ex)
             {
-                query = query.Where(x =>
-                    x.Name.ToLower().Contains(request.Search)
-                    || x.CreatedOn.ToString().Contains(request.Search)
-                );
+                await transaction.RollbackAsync(ct);
+
+                throw new DatabaseExecuteQueryException(ex.Message, ex.InnerException);
             }
-
-            var result = _mapper.Map<IEnumerable<CategoryDto>>(query);
-
-            return new PaginationResponse<IEnumerable<CategoryDto>>
-            {
-                IsSuccess = true,
-                Message = _success,
-                Count = result.Count(),
-                PageNumber = request.Page,
-                PageSize = request.Size,
-                TotalCount = totalCount,
-                Result = result
-            };
-        }
-        catch (Exception ex)
-        {
-            throw new DatabaseExecuteQueryException(ex.Message, ex.InnerException);
         }
     }
 }

@@ -1,24 +1,4 @@
-﻿using System.Linq.Expressions;
-using System.Security.Claims;
-using AutoMapper;
-using eCommerce.Domain.Constants;
-using eCommerce.Domain.Entities.Shared;
-using eCommerce.Domain.Exceptions;
-using eCommerce.Persistence.Builders;
-using eCommerce.Presentation.Extensions;
-using eCommerce.Presentation.Features.Identity.Users.Dto;
-using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Authenticate;
-using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.ChangePassword;
-using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Create;
-using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Get;
-using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.GetAll;
-using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Register;
-using eCommerce.Presentation.Features.Identity.Users.Endpoints.V1.Update;
-using eCommerce.Presentation.Json.Service;
-using eCommerce.Presentation.Jwt.Dto;
-using eCommerce.Presentation.Jwt.Service;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using IsolationLevel = System.Data.IsolationLevel;
 
 namespace eCommerce.Presentation.Features.Identity.Users.DaoService;
 
@@ -85,7 +65,15 @@ public sealed class UserDaoService : IUserDaoService
             cfg.CreateMap<UserPermission, UserDto.UserPermissionDto>();
             cfg.CreateMap<Permission, UserDto.UserPermissionDto.PermissionDto>();
 
-            cfg.CreateMap<RegisterUserRequest, User>();
+            cfg.CreateMap<RegisterUserRequest, User>()
+                .ForMember(
+                    dist => dist.NormalizedEmail,
+                    cfg => cfg.MapFrom(src => src.Email.ToUpper())
+                )
+                .ForMember(
+                    dist => dist.NormalizedUserName,
+                    cfg => cfg.MapFrom(src => src.UserName.ToUpper())
+                );
 
             cfg.CreateMap<TokenDto, UserToken>().ReverseMap();
         });
@@ -101,13 +89,15 @@ public sealed class UserDaoService : IUserDaoService
             var modifiedRows = 0;
 
             var user = _mapper.Map<User>(request);
+            user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, request.Password);
 
             var tokenDto = await _jwtService.GenerateTokenAsync(user, request.AuthProvider, ct);
 
             var token = _mapper.Map<UserToken>(tokenDto);
             user.Token = token;
 
-            var result = await _userManager.CreateAsync(user, request.Password);
+            modifiedRows++;
+            await _users.AddAsync(user);
 
             var jsonModel = await _jsonService.SeralizeAsync(user, ct);
 
@@ -127,10 +117,9 @@ public sealed class UserDaoService : IUserDaoService
             await _notifications.AddAsync(notification, ct);
             #endregion
 
-
             var success = await _context.IsDoneAsync(modifiedRows, ct);
 
-            if (success && result.Succeeded)
+            if (success)
             {
                 await transaction.CommitAsync(ct);
 
@@ -172,28 +161,31 @@ public sealed class UserDaoService : IUserDaoService
 
     public async Task<Response> LogoutAsync(CancellationToken ct)
     {
-        using var transaction = await _context.BeginTransactionAsync(ct);
-        try
+        using (var transaction = await _context.BeginTransactionAsync(IsolationLevel.Snapshot, ct))
         {
-            var modifiedRows = 0;
-            var token = await _userTokens.FirstAsync(x => x.UserId == Guid.Parse(_userId));
-
-            modifiedRows += await _userTokens
-                .AsNoTracking()
-                .Where(x => x.UserId == Guid.Parse(_userId))
-                .ExecuteDeleteAsync(ct);
-
-            if (modifiedRows == 1)
+            try
             {
-                await transaction.CommitAsync(ct);
-                return new Response { IsSuccess = true, Message = _success, };
+                var modifiedRows = 0;
+                var token = await _userTokens.FirstAsync(x => x.UserId == Guid.Parse(_userId));
+
+                modifiedRows += await _userTokens
+                    .AsNoTracking()
+                    .Where(x => x.UserId == Guid.Parse(_userId))
+                    .ExecuteDeleteAsync(ct);
+
+                if (modifiedRows == 1)
+                {
+                    await transaction.CommitAsync(ct);
+                    return new Response { IsSuccess = true, Message = _success, };
+                }
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException();
             }
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+            }
         }
     }
 
@@ -202,178 +194,189 @@ public sealed class UserDaoService : IUserDaoService
         CancellationToken ct
     )
     {
-        using var transaction = await _context.BeginTransactionAsync(ct);
-        try
+        using (var transaction = await _context.BeginTransactionAsync(IsolationLevel.Snapshot, ct))
         {
-            var modifiedRows = 0;
-
-            var user = await _userManager
-                .Users.Include(x => x.Token)
-                .FirstAsync(x => x.Id == Guid.Parse(_userId));
-
-            var tokenDto = await _jwtService.GenerateTokenAsync(user, LoginProvider.System, ct);
-
-            var token = _mapper.Map<UserToken>(tokenDto);
-
-            if (user.Token != null)
-                modifiedRows += await _userTokens
-                    .AsNoTracking()
-                    .Where(x => x.UserId == user.Id)
-                    .ExecuteDeleteAsync(ct);
-
-            var result = await _userManager.ChangePasswordAsync(
-                user,
-                request.OldPassword,
-                request.NewPassword
-            );
-
-            if (modifiedRows == 1 && result.Succeeded)
+            try
             {
-                await transaction.CommitAsync(ct);
+                var modifiedRows = 0;
 
-                return new Response { IsSuccess = true, Message = _success, };
+                var user = await _userManager
+                    .Users.Include(x => x.Token)
+                    .FirstAsync(x => x.Id == Guid.Parse(_userId));
+
+                var tokenDto = await _jwtService.GenerateTokenAsync(user, LoginProvider.System, ct);
+
+                var token = _mapper.Map<UserToken>(tokenDto);
+
+                if (user.Token != null)
+                    modifiedRows += await _userTokens
+                        .AsNoTracking()
+                        .Where(x => x.UserId == user.Id)
+                        .ExecuteDeleteAsync(ct);
+
+                var result = await _userManager.ChangePasswordAsync(
+                    user,
+                    request.OldPassword,
+                    request.NewPassword
+                );
+
+                if (modifiedRows == 1 && result.Succeeded)
+                {
+                    await transaction.CommitAsync(ct);
+
+                    return new Response { IsSuccess = true, Message = _success, };
+                }
+
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException();
             }
-
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException(ex.Message, ex);
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException(ex.Message, ex);
+            }
         }
     }
 
     public async Task<Response> CreatAsync(CreateUserRequest request, CancellationToken ct)
     {
-        using var transaction = await _context.BeginTransactionAsync(ct);
-        try
+        using (var transaction = await _context.BeginTransactionAsync(ct))
         {
-            var modifiedRows = 0;
-
-            var user = _mapper.Map<User>(request);
-
-            var jsonModel = await _jsonService.SeralizeAsync(user, ct);
-
-            var result = await _userManager.CreateAsync(user, request.Password);
-
-            #region Notify System
-            var notification = new NotificationBuilder()
-                .WithCommandType(CommandType.Create)
-                .WithEntity(EntityName.User)
-                .WithFeature(FeatureName.User)
-                .WithModule(ModuleName.Identity)
-                .WithServiceName(nameof(UserDaoService))
-                .WithEntityValue(jsonModel)
-                .WithEntityId(user.Id)
-                .WithCreatedBy(Guid.Parse(SystemConstants.SYSTEM_KEY))
-                .Build();
-
-            modifiedRows++;
-            await _notifications.AddAsync(notification, ct);
-            #endregion
-
-            var success = await _context.IsDoneAsync(modifiedRows, ct);
-            if (success && result.Succeeded)
+            try
             {
-                await transaction.CommitAsync(ct);
+                var modifiedRows = 0;
+
+                var user = _mapper.Map<User>(request);
+
+                var jsonModel = await _jsonService.SeralizeAsync(user, ct);
+
+                var result = await _userManager.CreateAsync(user, request.Password);
+
+                #region Notify System
+                var notification = new NotificationBuilder()
+                    .WithCommandType(CommandType.Create)
+                    .WithEntity(EntityName.User)
+                    .WithFeature(FeatureName.User)
+                    .WithModule(ModuleName.Identity)
+                    .WithServiceName(nameof(UserDaoService))
+                    .WithEntityValue(jsonModel)
+                    .WithEntityId(user.Id)
+                    .WithCreatedBy(Guid.Parse(SystemConstants.SYSTEM_KEY))
+                    .Build();
+
+                modifiedRows++;
+                await _notifications.AddAsync(notification, ct);
+                #endregion
+
+                var success = await _context.IsDoneAsync(modifiedRows, ct);
+                if (success && result.Succeeded)
+                {
+                    await transaction.CommitAsync(ct);
+                    var userDto = _mapper.Map<UserDto>(user);
+
+                    return new Response<UserDto>
+                    {
+                        IsSuccess = true,
+                        Message = _success,
+                        Result = userDto
+                    };
+                }
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException(ex.Message);
+            }
+        }
+    }
+
+    public async Task<Response> UpdateAsync(UpdateUserRequest request, CancellationToken ct)
+    {
+        using (var transaction = await _context.BeginTransactionAsync(IsolationLevel.Snapshot, ct))
+        {
+            try
+            {
+                var modifiedRows = 0;
+
+                var user = await _users
+                    .AsNoTracking()
+                    .Include(x => x.Profile)
+                    .ThenInclude(x => x.Address)
+                    .FirstAsync(x => x.Id == request.UserId);
+
+                if (user.Profile != null)
+                {
+                    modifiedRows++;
+                    if (user.Profile.Address != null)
+                    {
+                        modifiedRows++;
+                    }
+                }
+
+                _mapper.Map(request, user);
+
+                modifiedRows++;
+                _users.Update(user);
+
+                var success = await _context.IsDoneAsync(modifiedRows, ct);
+
+                if (success)
+                {
+                    await transaction.CommitAsync(ct);
+
+                    var result = _mapper.Map<UserDto>(user);
+
+                    return new Response<UserDto>
+                    {
+                        IsSuccess = true,
+                        Message = _success,
+                        Result = result
+                    };
+                }
+
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(ct);
+
+                throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+            }
+        }
+    }
+
+    public async Task<Response> GetAsync(GetUserRequest request, CancellationToken ct)
+    {
+        using (
+            var transaction = await _context.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct)
+        )
+        {
+            try
+            {
+                var user = await _users
+                    .AsNoTracking()
+                    .Include(x => x.Profile)
+                    .ThenInclude(x => x.Address)
+                    .Include(x => x.UserPremissions)
+                    .ThenInclude(x => x.Permission)
+                    .FirstAsync(x => x.Id == request.Id);
+
                 var userDto = _mapper.Map<UserDto>(user);
 
                 return new Response<UserDto>
                 {
                     IsSuccess = true,
                     Message = _success,
-                    Result = userDto
+                    Result = userDto,
                 };
             }
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException(ex.Message);
-        }
-    }
-
-    public async Task<Response> UpdateAsync(UpdateUserRequest request, CancellationToken ct)
-    {
-        using var transaction = await _context.BeginTransactionAsync(ct);
-        try
-        {
-            var modifiedRows = 0;
-
-            var user = await _users
-                .AsNoTracking()
-                .Include(x => x.Profile)
-                .ThenInclude(x => x.Address)
-                .FirstAsync(x => x.Id == request.UserId);
-
-            if (user.Profile != null)
+            catch (Exception ex)
             {
-                modifiedRows++;
-                if (user.Profile.Address != null)
-                {
-                    modifiedRows++;
-                }
+                throw new DatabaseExecuteQueryException(ex.Message, ex);
             }
-
-            _mapper.Map(request, user);
-
-            modifiedRows++;
-            _users.Update(user);
-
-            var success = await _context.IsDoneAsync(modifiedRows, ct);
-
-            if (success)
-            {
-                await transaction.CommitAsync(ct);
-
-                var result = _mapper.Map<UserDto>(user);
-
-                return new Response<UserDto>
-                {
-                    IsSuccess = true,
-                    Message = _success,
-                    Result = result
-                };
-            }
-
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(ct);
-
-            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
-        }
-    }
-
-    public async Task<Response> GetAsync(GetUserRequest request, CancellationToken ct)
-    {
-        try
-        {
-            var user = await _users
-                .AsNoTracking()
-                .Include(x => x.Profile)
-                .ThenInclude(x => x.Address)
-                .Include(x => x.UserPremissions)
-                .ThenInclude(x => x.Permission)
-                .FirstAsync(x => x.Id == request.Id);
-
-            var userDto = _mapper.Map<UserDto>(user);
-
-            return new Response<UserDto>
-            {
-                IsSuccess = true,
-                Message = _success,
-                Result = userDto,
-            };
-        }
-        catch (Exception ex)
-        {
-            throw new DatabaseExecuteQueryException(ex.Message, ex);
         }
     }
 
@@ -383,52 +386,59 @@ public sealed class UserDaoService : IUserDaoService
         CancellationToken ct
     )
     {
-        try
+        using (
+            var transaction = await _context.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct)
+        )
         {
-            var query = _users
-                .AsNoTracking()
-                .Include(x => x.Profile)
-                .ThenInclude(x => x.Address)
-                .Include(x => x.UserPremissions)
-                .ThenInclude(x => x.Permission)
-                .AsQueryable();
-
-            var totalCount = await query.CountAsync(ct);
-
-            query = query.Paginate(request, orderBy);
-
-            if (request.IsDeleted)
+            try
             {
-                query = query.IgnoreQueryFilters().Where(x => x.IsDeleted);
-                totalCount = await query.CountAsync(ct);
+                var query = _users
+                    .AsNoTracking()
+                    .Include(x => x.Profile)
+                    .ThenInclude(x => x.Address)
+                    .Include(x => x.UserPremissions)
+                    .ThenInclude(x => x.Permission)
+                    .AsQueryable();
+
+                var totalCount = await query.CountAsync(ct);
+
+                query = query.Paginate(request, orderBy);
+
+                if (request.IsDeleted)
+                {
+                    query = query.IgnoreQueryFilters().Where(x => x.IsDeleted);
+                    totalCount = await query.CountAsync(ct);
+                }
+
+                if (!string.IsNullOrEmpty(request.Search))
+                {
+                    query = query.Where(x =>
+                        x.UserName.Contains(request.Search.ToLower())
+                        || x.Email.Contains(request.Search.ToLower())
+                        || (
+                            x.Profile != null ? x.Profile.FirstName.Contains(request.Search) : false
+                        )
+                        || (x.Profile != null ? x.Profile.LastName.Contains(request.Search) : false)
+                    );
+                }
+
+                var userDto = _mapper.Map<IEnumerable<UserDto>>(query);
+
+                return new PaginationResponse<IEnumerable<UserDto>>
+                {
+                    Count = userDto.Count(),
+                    IsSuccess = true,
+                    Message = _success,
+                    PageNumber = request.Page,
+                    PageSize = request.Size,
+                    Result = userDto,
+                    TotalCount = totalCount,
+                };
             }
-
-            if (!string.IsNullOrEmpty(request.Search))
+            catch (Exception ex)
             {
-                query = query.Where(x =>
-                    x.UserName.Contains(request.Search.ToLower())
-                    || x.Email.Contains(request.Search.ToLower())
-                    || (x.Profile != null ? x.Profile.FirstName.Contains(request.Search) : false)
-                    || (x.Profile != null ? x.Profile.LastName.Contains(request.Search) : false)
-                );
+                throw new DatabaseExecuteQueryException(ex.Message, ex.InnerException);
             }
-
-            var userDto = _mapper.Map<IEnumerable<UserDto>>(query);
-
-            return new PaginationResponse<IEnumerable<UserDto>>
-            {
-                Count = userDto.Count(),
-                IsSuccess = true,
-                Message = _success,
-                PageNumber = request.Page,
-                PageSize = request.Size,
-                Result = userDto,
-                TotalCount = totalCount,
-            };
-        }
-        catch (Exception ex)
-        {
-            throw new DatabaseExecuteQueryException(ex.Message, ex.InnerException);
         }
     }
 
@@ -436,105 +446,109 @@ public sealed class UserDaoService : IUserDaoService
 
     async Task<TokenDto> LoginAsync(AuthenticateUserRequest request, CancellationToken ct)
     {
-        using var transaction = await _context.BeginTransactionAsync(ct);
-        try
+        using (var transaction = await _context.BeginTransactionAsync(IsolationLevel.Snapshot, ct))
         {
-            var modifiedRows = 0;
+            try
+            {
+                var modifiedRows = 0;
 
-            var user = await _users
-                .AsNoTracking()
-                .Include(x => x.Claims)
-                .Include(x => x.UserRoles)
-                .ThenInclude(x => x.Role)
-                .ThenInclude(x => x.Claims)
-                .Include(x => x.UserPremissions)
-                .ThenInclude(x => x.Permission)
-                .Include(x => x.Token)
-                .FirstAsync(
-                    x =>
-                        new EmailAddressAttribute().IsValid(request.EmailOrUserName)
-                            ? x.NormalizedEmail == request.EmailOrUserName.ToUpper()
-                            : x.NormalizedUserName == request.EmailOrUserName.ToUpper(),
+                var user = await _users
+                    .AsNoTracking()
+                    .Include(x => x.Claims)
+                    .Include(x => x.UserRoles)
+                    .ThenInclude(x => x.Role)
+                    .ThenInclude(x => x.Claims)
+                    .Include(x => x.UserPremissions)
+                    .ThenInclude(x => x.Permission)
+                    .Include(x => x.Token)
+                    .FirstAsync(
+                        x =>
+                            new EmailAddressAttribute().IsValid(request.EmailOrUserName)
+                                ? x.NormalizedEmail == request.EmailOrUserName.ToUpper()
+                                : x.NormalizedUserName == request.EmailOrUserName.ToUpper(),
+                        ct
+                    );
+
+                var tokenDto = await _jwtService.GenerateTokenAsync(
+                    user,
+                    request.LoginProvider.Value,
                     ct
                 );
+                var token = _mapper.Map<UserToken>(tokenDto);
 
-            var tokenDto = await _jwtService.GenerateTokenAsync(
-                user,
-                request.LoginProvider.Value,
-                ct
-            );
-            var token = _mapper.Map<UserToken>(tokenDto);
+                if (user.Token != null)
+                    await _userTokens.Where(x => x.Id == user.Token.Id).ExecuteDeleteAsync(ct);
 
-            if (user.Token != null)
-                await _userTokens.Where(x => x.Id == user.Token.Id).ExecuteDeleteAsync(ct);
+                modifiedRows++;
+                await _userTokens.AddAsync(token);
 
-            modifiedRows++;
-            await _userTokens.AddAsync(token);
+                var success = await _context.IsDoneAsync(modifiedRows, ct);
 
-            var success = await _context.IsDoneAsync(modifiedRows, ct);
+                if (success)
+                {
+                    await transaction.CommitAsync(ct);
 
-            if (success)
-            {
-                await transaction.CommitAsync(ct);
+                    return tokenDto;
+                }
 
-                return tokenDto;
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException();
             }
-
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+            }
         }
     }
 
     async Task<TokenDto> RefreshTokenAsync(AuthenticateUserRequest request, CancellationToken ct)
     {
-        using var transaction = await _context.BeginTransactionAsync(ct);
-        try
+        using (var transaction = await _context.BeginTransactionAsync(IsolationLevel.Snapshot, ct))
         {
-            var modifiedRows = 0;
-
-            var user = await _users
-                .AsNoTracking()
-                .Include(x => x.Claims)
-                .Include(x => x.UserRoles)
-                .ThenInclude(x => x.Role)
-                .ThenInclude(x => x.Claims)
-                .Include(x => x.UserPremissions)
-                .ThenInclude(x => x.Permission)
-                .Include(x => x.Token)
-                .FirstAsync(x => x.Token.RefreshToken == request.RefreshToken, ct);
-
-            var tokenDto = await _jwtService.GenerateTokenAsync(user, LoginProvider.System, ct);
-            var token = _mapper.Map<UserToken>(tokenDto);
-
-            await _userTokens
-                .AsNoTracking()
-                .Where(x => x.UserId == user.Id && x.RefreshToken == request.RefreshToken)
-                .ExecuteDeleteAsync(ct);
-
-            modifiedRows++;
-            await _userTokens.AddAsync(token);
-
-            var success = await _context.IsDoneAsync(modifiedRows, ct);
-
-            if (success)
+            try
             {
-                await transaction.CommitAsync(ct);
+                var modifiedRows = 0;
 
-                return tokenDto;
+                var user = await _users
+                    .AsNoTracking()
+                    .Include(x => x.Claims)
+                    .Include(x => x.UserRoles)
+                    .ThenInclude(x => x.Role)
+                    .ThenInclude(x => x.Claims)
+                    .Include(x => x.UserPremissions)
+                    .ThenInclude(x => x.Permission)
+                    .Include(x => x.Token)
+                    .FirstAsync(x => x.Token.RefreshToken == request.RefreshToken, ct);
+
+                var tokenDto = await _jwtService.GenerateTokenAsync(user, LoginProvider.System, ct);
+                var token = _mapper.Map<UserToken>(tokenDto);
+
+                await _userTokens
+                    .AsNoTracking()
+                    .Where(x => x.UserId == user.Id && x.RefreshToken == request.RefreshToken)
+                    .ExecuteDeleteAsync(ct);
+
+                modifiedRows++;
+                await _userTokens.AddAsync(token);
+
+                var success = await _context.IsDoneAsync(modifiedRows, ct);
+
+                if (success)
+                {
+                    await transaction.CommitAsync(ct);
+
+                    return tokenDto;
+                }
+
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException();
             }
-
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(ct);
-            throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(ct);
+                throw new DatabaseTransactionException(ex.Message, ex.InnerException);
+            }
         }
     }
 

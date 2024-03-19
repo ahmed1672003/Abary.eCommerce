@@ -8,8 +8,6 @@ internal sealed class CreateServiceValidator : Validator<CreateServiceRequest>
     {
         ClassLevelCascadeMode = CascadeMode.Stop;
         RuleLevelCascadeMode = CascadeMode.Stop;
-        var _context = Resolve<IeCommerceDbContext>();
-        var _services = _context.Set<Service>();
 
         RuleFor(x => x.Name)
             .NotNull()
@@ -40,9 +38,14 @@ internal sealed class CreateServiceValidator : Validator<CreateServiceRequest>
             .MustAsync(
                 async (req, ct) =>
                 {
-                    return !await _services
-                        .AsNoTracking()
-                        .AnyAsync(x => x.Name.ToLower().Equals(req.Name.ToLower()), ct);
+                    using (var _context = Resolve<IeCommerceDbContext>())
+                    {
+                        var _services = _context.Set<Service>();
+
+                        return !await _services
+                            .AsNoTracking()
+                            .AnyAsync(x => x.Name.ToLower() == req.Name.ToLower(), ct);
+                    }
                 }
             )
             .WithMessage("توجد خدمة بهذا الاسم");

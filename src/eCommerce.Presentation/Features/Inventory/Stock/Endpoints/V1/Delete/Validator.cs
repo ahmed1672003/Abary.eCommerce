@@ -18,7 +18,7 @@ internal sealed class DeleteStockValidator : Validator<DeleteStockRequest>
                         return await context
                             .Set<Stock>()
                             .AsNoTracking()
-                            .AnyAsync(x => x.Id.Equals(req.Id), ct);
+                            .AnyAsync(x => x.Id == req.Id, ct);
                     }
                 }
             )
@@ -34,7 +34,7 @@ internal sealed class DeleteStockValidator : Validator<DeleteStockRequest>
                             .Set<Stock>()
                             .AsNoTracking()
                             .Include(x => x.StockProducts)
-                            .AnyAsync(x => x.Id.Equals(req.Id) && x.StockProducts.Any(), ct);
+                            .AnyAsync(x => x.Id == req.Id && x.StockProducts.Any(), ct);
                     }
                 }
             )

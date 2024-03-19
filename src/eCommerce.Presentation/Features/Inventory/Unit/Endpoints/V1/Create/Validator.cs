@@ -36,9 +36,9 @@ internal sealed class CreatUnitValidator : Validator<CreateUnitRequest>
                     {
                         var _units = _context.Set<Unit>();
 
-                        return !await _units.AnyAsync(x =>
-                            x.Name.ToLower().Equals(req.Name.ToLower())
-                        );
+                        return !await _units
+                            .AsNoTracking()
+                            .AnyAsync(x => x.Name.ToLower() == req.Name.ToLower());
                     }
                 }
             )
