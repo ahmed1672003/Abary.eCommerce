@@ -25,12 +25,20 @@ public sealed class Product
     #endregion
 
     #region Props
-    public decimal PurchasePrice { get; set; }
-    public decimal SalePrice { get; set; }
-    public DateTime CreatedOn { get; set; }
+    public string Name { get; set; }
+    public List<string> PhotoUrls { get; set; }
+    public double PurchasePrice { get; set; }
+    public double SellingPrice { get; set; }
+    public double Discount { get; set; } = 0;
+    public double Tax { get; set; } = 0;
+    public bool IsTaxPercentage { get; set; }
+    public bool IsDiscountPercentage { get; set; }
+    public bool AllowDiscount { get; set; }
+    public bool AllowTax { get; set; }
+    public bool IsDeleted { get; set; }
     public DateTime? DeletedOn { get; set; }
     public DateTime? UpdatedOn { get; set; }
-    public bool IsDeleted { get; set; }
+    public DateTime CreatedOn { get; set; }
     #endregion
 
     #region Navigation Props

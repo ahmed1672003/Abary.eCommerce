@@ -2,7 +2,7 @@
 
 namespace eCommerce.Persistence.Configs.Inventory;
 
-internal class ProductConfig : IEntityTypeConfiguration<Product>
+internal sealed class ProductConfig : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {

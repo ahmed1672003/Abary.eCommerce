@@ -16,6 +16,5 @@ public enum FeatureName
     Stock,
     Service,
     Product,
-    ProductAttribute,
     Unit,
 }

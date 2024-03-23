@@ -24,10 +24,11 @@ public sealed class Stock
 
     #region Props
     public string Name { get; set; }
+    public bool IsDefault { get; set; }
+    public bool IsDeleted { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
     public DateTime? UpdatedOn { get; set; }
-    public bool IsDeleted { get; set; }
     #endregion
 
     #region Navigation Props

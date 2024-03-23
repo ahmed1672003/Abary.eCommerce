@@ -1,3 +1,9 @@
 ﻿namespace eCommerce.Domain.Enums.Inventory.Products;
 
-public enum ProductOrderBy { }
+public enum ProductOrderBy
+{
+    Id,
+    Name,
+    PurchasePrice,
+    SellingPrice,
+}
