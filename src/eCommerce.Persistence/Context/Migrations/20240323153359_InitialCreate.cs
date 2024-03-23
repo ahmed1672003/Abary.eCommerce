@@ -317,10 +317,11 @@ namespace eCommerce.Persistence.Context.Migrations
                     DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
+                    IsDefault = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -373,12 +374,20 @@ namespace eCommerce.Persistence.Context.Migrations
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    PurchasePrice = table.Column<decimal>(type: "numeric", nullable: false),
-                    SalePrice = table.Column<decimal>(type: "numeric", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    PhotoUrls = table.Column<List<string>>(type: "text[]", nullable: false),
+                    PurchasePrice = table.Column<double>(type: "double precision", nullable: false),
+                    SellingPrice = table.Column<double>(type: "double precision", nullable: false),
+                    Discount = table.Column<double>(type: "double precision", nullable: false),
+                    Tax = table.Column<double>(type: "double precision", nullable: false),
+                    IsTaxPercentage = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDiscountPercentage = table.Column<bool>(type: "boolean", nullable: false),
+                    AllowDiscount = table.Column<bool>(type: "boolean", nullable: false),
+                    AllowTax = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -682,6 +691,7 @@ namespace eCommerce.Persistence.Context.Migrations
                     UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -713,15 +723,16 @@ namespace eCommerce.Persistence.Context.Migrations
                 {
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
                     StockId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Qty = table.Column<int>(type: "integer", nullable: false),
-                    Price = table.Column<int>(type: "integer", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     DeletedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    Qty = table.Column<int>(type: "integer", nullable: false),
+                    AllowExpireOn = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                    ExpireOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {

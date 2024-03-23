@@ -728,6 +728,12 @@ namespace eCommerce.Persistence.Context.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("AllowDiscount")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AllowTax")
+                        .HasColumnType("boolean");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
@@ -740,14 +746,34 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<double>("Discount")
+                        .HasColumnType("double precision");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<decimal>("PurchasePrice")
-                        .HasColumnType("numeric");
+                    b.Property<bool>("IsDiscountPercentage")
+                        .HasColumnType("boolean");
 
-                    b.Property<decimal>("SalePrice")
-                        .HasColumnType("numeric");
+                    b.Property<bool>("IsTaxPercentage")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<List<string>>("PhotoUrls")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<double>("PurchasePrice")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("SellingPrice")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Tax")
+                        .HasColumnType("double precision");
 
                     b.Property<Guid>("UnitId")
                         .HasColumnType("uuid");
@@ -828,6 +854,9 @@ namespace eCommerce.Persistence.Context.Migrations
 
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -916,6 +945,9 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -944,6 +976,9 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<Guid>("StockId")
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("AllowExpireOn")
+                        .HasColumnType("boolean");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
@@ -956,11 +991,11 @@ namespace eCommerce.Persistence.Context.Migrations
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("ExpireOn")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("integer");
 
                     b.Property<int>("Qty")
                         .HasColumnType("integer");
